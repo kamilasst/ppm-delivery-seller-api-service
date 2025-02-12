@@ -29,6 +29,7 @@ public class ControllerRequestInterceptor implements HandlerInterceptor {
         final String correlationId = request.getHeader(ContextConstants.HEADER_CORRELATION_ID);
         final String timestamp = request.getHeader(ContextConstants.HEADER_TIMESTAMP);
         final String source = request.getHeader(ContextConstants.HEADER_SOURCE);
+        final String authorization = request.getHeader(ContextConstants.HEADER_AUTHORIZATION);
         final String type = request.getHeader(ContextConstants.HEADER_TYPE);
         final String eventName = request.getHeader(ContextConstants.HEADER_EVENT_NAME);
         final String eventVersion = request.getHeader(ContextConstants.HEADER_EVENT_VERSION);
@@ -41,6 +42,7 @@ public class ControllerRequestInterceptor implements HandlerInterceptor {
                 correlationId,
                 timestamp,
                 source,
+                authorization,
                 type,
                 new Event(eventName, eventVersion),
                 new UserInfo(userInfoId, userInfoProfile),
