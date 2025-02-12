@@ -4,7 +4,7 @@ public record Header(
         String correlationId,
         String timestamp,
         String source,
-//        String authorization,
+        String authorization,
         String type,
         Event event,
         UserInfo userInfo,

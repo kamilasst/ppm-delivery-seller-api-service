@@ -7,6 +7,7 @@ public class ContextConstants {
     public static final String HEADER_CORRELATION_ID = "correlationId";
     public static final String HEADER_TIMESTAMP = "timestamp";
     public static final String HEADER_SOURCE = "source";
+    public static final String HEADER_AUTHORIZATION = "authorization";
     public static final String HEADER_TYPE = "type";
     public static final String HEADER_EVENT_NAME = "eventName";
     public static final String HEADER_EVENT_VERSION = "eventVersion";

@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.api.controller;
 
 import com.ppm.delivery.seller.api.service.api.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.response.SellerDTOResponse;
+import com.ppm.delivery.seller.api.service.api.service.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +12,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/seller")
 public class SellerController implements ISellerController{
 
-    //TODO criar o Header e saber para que ele server
+    private SellerService sellerService;
+
+    public SellerController(SellerService sellerService){
+        this.sellerService = sellerService;
+    }
+
     @Override
     public ResponseEntity<SellerDTOResponse> create(@Valid @RequestBody SellerDTORequest sellerDTORequest){
-        System.out.println(sellerDTORequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        SellerDTOResponse sellerDTOResponse = sellerService.create(sellerDTORequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sellerDTOResponse);
     }
 
 }
