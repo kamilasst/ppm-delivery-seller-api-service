@@ -1,8 +1,8 @@
 package com.ppm.delivery.seller.api.service.api.controller;
 
-import com.ppm.delivery.seller.api.service.api.request.SellerDTORequest;
-import com.ppm.delivery.seller.api.service.api.response.SellerDTOResponse;
-import com.ppm.delivery.seller.api.service.api.service.SellerService;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
+import com.ppm.delivery.seller.api.service.service.SellerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
