@@ -1,8 +1,8 @@
 package com.ppm.delivery.seller.api.service.api.interceptor;
 
-import com.ppm.delivery.seller.api.service.api.exception.MessageErrorConstants;
-import com.ppm.delivery.seller.api.service.api.exception.PPMBadRequestException;
-import com.ppm.delivery.seller.api.service.api.request.header.Header;
+import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
+import com.ppm.delivery.seller.api.service.exception.PPMBadRequestException;
+import com.ppm.delivery.seller.api.service.api.domain.request.header.Header;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.stereotype.Component;
 

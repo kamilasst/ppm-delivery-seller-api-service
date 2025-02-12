@@ -1,6 +1,6 @@
 package com.ppm.delivery.seller.api.service.api.config;
 
-import com.ppm.delivery.seller.api.service.api.interceptor.ControllerRequestInterceptor;
+import com.ppm.delivery.seller.api.service.api.interceptor.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,10 +10,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorConfig implements WebMvcConfigurer {
 
     @Autowired
-    private ControllerRequestInterceptor controllerRequestInterceptor;
+    private RequestInterceptor requestInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(controllerRequestInterceptor);
+        registry.addInterceptor(requestInterceptor);
     }
 }

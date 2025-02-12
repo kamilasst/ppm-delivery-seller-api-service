@@ -1,7 +1,7 @@
 package com.ppm.delivery.seller.api.service.api.controller;
 
-import com.ppm.delivery.seller.api.service.api.request.SellerDTORequest;
-import com.ppm.delivery.seller.api.service.api.response.SellerDTOResponse;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
