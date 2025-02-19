@@ -1,13 +1,11 @@
 package com.ppm.delivery.seller.api.service.api.domain.request;
 
-import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
-import java.util.Map;
 
 public record SellerDTORequest(
         @Valid
@@ -28,7 +26,8 @@ public record SellerDTORequest(
         AddressDTORequest address,
         @NotBlank(message = "CreatorId is required")
         String creatorId,
-        Map<String, List<BusinessHour>> businessHours
+        @Valid
+        List<BusinessHourDTORequest> businessHours
 
 ) {
 }
