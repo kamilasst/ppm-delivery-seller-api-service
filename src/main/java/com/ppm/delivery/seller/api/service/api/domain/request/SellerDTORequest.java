@@ -10,7 +10,7 @@ import java.util.List;
 public record SellerDTORequest(
         @Valid
         @NotNull(message = "CodeIdentification is required")
-        CodeIdentificationDTORequest codeIdentification,
+        IdentificationCodeDTORequest identificationCode,
         @NotBlank(message = "Name is required")
         @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
         String name,
