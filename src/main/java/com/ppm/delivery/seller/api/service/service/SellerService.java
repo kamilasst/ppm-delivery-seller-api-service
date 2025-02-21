@@ -6,6 +6,8 @@ import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
 import com.ppm.delivery.seller.api.service.domain.model.Audit;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
+import com.ppm.delivery.seller.api.service.exception.IdentificationCodeAlreadyExistsException;
+import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,10 @@ public class SellerService implements ISellerService {
     }
     @Override
     public SellerDTOResponse create(SellerDTORequest sellerDTORequest) {
+
+        if (sellerRepository.existsByIdentificationCode_Code(sellerDTORequest.identificationCode().code())){
+            throw new IdentificationCodeAlreadyExistsException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                 .withZone(ZoneOffset.UTC);

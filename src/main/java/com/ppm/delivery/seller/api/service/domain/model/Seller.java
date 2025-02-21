@@ -24,7 +24,7 @@ public class Seller {
     private String code;
 
     @Embedded
-    private CodeIdentification codeIdentification;
+    private IdentificationCode identificationCode;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
