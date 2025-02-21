@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Embeddable
-public class CodeIdentification {
+public class IdentificationCode {
 
     @Column(name = "identification_type", nullable = false)
     private String type;
