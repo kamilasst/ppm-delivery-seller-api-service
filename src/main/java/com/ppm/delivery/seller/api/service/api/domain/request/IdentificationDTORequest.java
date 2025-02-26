@@ -1,8 +1,10 @@
 package com.ppm.delivery.seller.api.service.api.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
-public record IdentificationCodeDTORequest(
+@Builder
+public record IdentificationDTORequest(
         @NotBlank(message = "Type is required")
         String type,
         @NotBlank(message = "Code is required")

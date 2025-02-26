@@ -13,26 +13,25 @@ import java.util.Objects;
 @Embeddable
 @Builder
 @ToString
-public class GeoCoordinates {
+public class Identification {
 
-    @Column(name = "latitude", length = 50)
-    private String latitude;
-
-    @Column(name = "longitude", length = 50)
-    private String longitude;
+    @Column(name = "identification_type", nullable = false)
+    private String type;
+    @Column(name = "identification_code", nullable = false, unique = true)
+    private String code;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GeoCoordinates that = (GeoCoordinates) o;
-        return Objects.equals(latitude, that.latitude) &&
-                Objects.equals(longitude, that.longitude);
+        Identification that = (Identification) o;
+        return Objects.equals(type, that.type) &&
+                Objects.equals(code, that.code);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(latitude, longitude);
+        return Objects.hash(type, code);
     }
 
 }
