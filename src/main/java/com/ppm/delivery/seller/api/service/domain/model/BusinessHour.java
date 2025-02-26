@@ -3,13 +3,15 @@ package com.ppm.delivery.seller.api.service.domain.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 @Entity
 @Table(name = "business_hour")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 public class BusinessHour {
 
@@ -29,5 +31,30 @@ public class BusinessHour {
     @ManyToOne
     @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
     private Seller seller;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BusinessHour that = (BusinessHour) o;
+        return Objects.equals(dayOfWeek, that.dayOfWeek) &&
+                Objects.equals(openAt, that.openAt) &&
+                Objects.equals(closeAt, that.closeAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayOfWeek, openAt, closeAt);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BusinessHour.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("dayOfWeek='" + dayOfWeek + "'")
+                .add("openAt='" + openAt + "'")
+                .add("closeAt='" + closeAt + "'")
+                .toString();
+    }
 
 }

@@ -2,7 +2,9 @@ package com.ppm.delivery.seller.api.service.api.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record LocationDTORequest(
         @NotNull(message = "GeoCoordinates is required")
         GeoCoordinatesDTORequest geoCoordinates,

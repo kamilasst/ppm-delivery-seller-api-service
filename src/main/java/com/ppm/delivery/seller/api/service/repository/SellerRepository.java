@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SellerRepository extends JpaRepository<Seller, Integer> {
 
-    boolean existsByIdentificationCode_Code(String code);
+    boolean existsByIdentificationCode(String code);
 }
