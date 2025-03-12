@@ -29,6 +29,7 @@ public class SellerControllerTest {
     @InjectMocks
     private SellerController sellerController;
 
+    // TODO Review: Por favor avalie renomear o método para shouldCreateSellerSuccessfully com intuito de manter o padrao
     @Test
     void testShouldCreateSellerSuccessfully(){
 
@@ -46,6 +47,7 @@ public class SellerControllerTest {
 
     }
 
+    // TODO Review: Por favor avalie renomear o método para shouldCreateSellerSuccessfully com intuito de manter o padrao
     @Test
     void testShouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
