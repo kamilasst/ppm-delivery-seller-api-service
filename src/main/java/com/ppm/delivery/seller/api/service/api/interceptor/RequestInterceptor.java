@@ -13,9 +13,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
 
+    private final ContextHolder context;
     private final RequestValidator requestValidator;
 
-    public RequestInterceptor(final RequestValidator requestValidator) {
+    public RequestInterceptor(final ContextHolder context,
+                              final RequestValidator requestValidator) {
+        this.context = context;
         this.requestValidator = requestValidator;
     }
 
@@ -36,6 +39,8 @@ public class RequestInterceptor implements HandlerInterceptor {
         final String userInfoProfile = request.getHeader(HeaderConstants.HEADER_USER_INFO_PROFILE);
         final String country = request.getHeader(HeaderConstants.HEADER_COUNTRY);
         final String platform = request.getHeader(HeaderConstants.HEADER_PLATFORM);
+
+        context.initializeContext(country);
 
         final Header header = new Header(
                 correlationId,

@@ -16,7 +16,7 @@ public class SellerRepository implements ISellerRepository {
 
     private final EntityManager entityManager;
 
-    public Seller save(Seller seller, String countryCode){
+    public Seller save(String countryCode, Seller seller){
 
         String tableName = getTableName(countryCode, "_seller");
         entityManager.createNativeQuery(
@@ -70,7 +70,7 @@ public class SellerRepository implements ISellerRepository {
         return seller;
     }
 
-    public Boolean findByCode(String code, String countryCode) {
+    public Boolean findByCode(String countryCode, String code) {
         String tableName = getTableName(countryCode, "_seller");
         try {
             Object result = entityManager.createNativeQuery(
