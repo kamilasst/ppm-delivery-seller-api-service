@@ -36,6 +36,8 @@ public class SellerServiceTest {
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
         Seller seller = SellerBuilder.create(request);
+
+        // TODO Review: Por favor avalie criar uma classe de constants. ex.: ConstantsMocks.COUNTRY_CODE_BR
         String countryCode = "BR";
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);

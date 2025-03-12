@@ -14,14 +14,16 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class SellerRepository implements ISellerRepository {
 
-    // TODO Review: Avalie criar constants para os nomes das coluas e tabelas. ex.: DataBaseContants.COLUMN_CODE / DataBaseContants.TABLE_SELLER
+    // TODO Review: Avalie criar constants para os nomes das colunas e tabelas. ex.: DataBaseContants.COLUMN_CODE / DataBaseContants.TABLE_SELLER
     private final EntityManager entityManager;
 
     public Seller save(String countryCode, Seller seller){
 
         String tableName = getTableName(countryCode, "_seller");
 
-        // TODO Review: Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertSeller
+        // TODO Review:
+        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertSeller
+        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
         entityManager.createNativeQuery(
                         "INSERT INTO " + tableName + " (code, identification_type, identification_code, name, display_name, " +
                                 "location_latitude, location_longitude, city, country, state, number, zip_code, street_address, " +
@@ -47,7 +49,9 @@ public class SellerRepository implements ISellerRepository {
                 .setParameter("updateAt", seller.getAudit().getUpdateAt())
                 .executeUpdate();
 
-        // TODO Review: Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertContract
+        // TODO Review:
+        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertContract
+        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
         String contactTable = getTableName(countryCode, "_contact");
         for (Contact contact : seller.getContacts()) {
             entityManager.createNativeQuery(
@@ -59,7 +63,9 @@ public class SellerRepository implements ISellerRepository {
                     .executeUpdate();
         }
 
-        // TODO Review: Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertBusinessHour
+        // TODO Review:
+        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertBusinessHour
+        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
         String businessHourTable = getTableName(countryCode, "_business_hour");
         for (BusinessHour businessHour : seller.getBusinessHours()) {
             entityManager.createNativeQuery(
@@ -79,6 +85,7 @@ public class SellerRepository implements ISellerRepository {
     //  1. Como o métooo retorna um boolean, avalie renomear para padrão java de método boolean ex.: isCodeExists
     //  2. Retorne boolean invés de Boolean isso evita NullPointerException
     //  3. Object result não está sendo usado, avalie remover
+    //  4. Avalie usar StringBuilder.append invés de concatenar String com +
     public Boolean findByCode(String countryCode, String code) {
         String tableName = getTableName(countryCode, "_seller");
         try {
