@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 @Entity
-@Table(name = "business_hour")
 @Getter
 @Setter
 @NoArgsConstructor
