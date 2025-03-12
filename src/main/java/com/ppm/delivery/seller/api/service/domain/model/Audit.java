@@ -13,10 +13,10 @@ import java.util.Objects;
 @ToString
 public class Audit {
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "create_at", nullable = false, updatable = false)
     private String createAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "update_at")
     private String updateAt;
 
     @Override
