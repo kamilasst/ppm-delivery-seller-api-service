@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/seller")
 public class SellerController implements ISellerController{
 
-    private SellerService sellerService;
+    private final SellerService sellerService;
 
     public SellerController(SellerService sellerService){
         this.sellerService = sellerService;

@@ -1,96 +1,128 @@
 package com.ppm.delivery.seller.api.service.repository;
 
-import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
-import com.ppm.delivery.seller.api.service.domain.model.Contact;
-import com.ppm.delivery.seller.api.service.domain.model.Seller;
+import com.ppm.delivery.seller.api.service.domain.model.*;
+import com.ppm.delivery.seller.api.service.utils.DataBaseConstants;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @Transactional
-@RequiredArgsConstructor
 public class SellerRepository implements ISellerRepository {
 
-    // TODO Review: Avalie criar constants para os nomes das colunas e tabelas. ex.: DataBaseContants.COLUMN_CODE / DataBaseContants.TABLE_SELLER
     private final EntityManager entityManager;
 
-    public Seller save(String countryCode, Seller seller){
+    public SellerRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-        String tableName = getTableName(countryCode, "_seller");
+    public Seller save(String countryCode, Seller seller) {
 
-        // TODO Review:
-        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertSeller
-        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
-        entityManager.createNativeQuery(
-                        "INSERT INTO " + tableName + " (code, identification_type, identification_code, name, display_name, " +
-                                "location_latitude, location_longitude, city, country, state, number, zip_code, street_address, " +
-                                "creator_id, status, create_at, update_at) VALUES " +
-                                "(:code, :idType, :idCode, :name, :displayName, :lat, :long, :city, :country, :state, :number, :zip, " +
-                                ":street, :creator, :status, :createAt, :updateAt)")
+        insertSeller(countryCode, seller);
+        insertContact(countryCode, seller);
+        insertBusinessHour(countryCode, seller);
+        return seller;
+
+    }
+
+    private void insertSeller(String countryCode, Seller seller) {
+        String tableName = getTableName(countryCode, DataBaseConstants.TABLE_SELLER);
+
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO ")
+                .append(tableName)
+                .append(" (code, identification_type, identification_code, name, display_name, " +
+                        "location_latitude, location_longitude, city, country, state, number, zip_code, street_address, " +
+                        "creator_id, status, create_at, update_at) VALUES " +
+                        "(:code, :idType, :idCode, :name, :displayName, :lat, :long, :city, :country, :state, :number, :zip, " +
+                        ":street, :creator, :status, :createAt, :updateAt)");
+
+        executeSellerInsert(seller, query);
+    }
+
+    private void executeSellerInsert(Seller seller, StringBuilder query) {
+
+        Location location = seller.getAddress().getLocation();
+        GeoCoordinates geoCoordinates = seller.getAddress().getLocation().getGeoCoordinates();
+        Audit audit = seller.getAudit();
+
+        entityManager.createNativeQuery(query.toString())
                 .setParameter("code", seller.getCode())
                 .setParameter("idType", seller.getIdentification().getType())
                 .setParameter("idCode", seller.getIdentification().getCode())
                 .setParameter("name", seller.getName())
                 .setParameter("displayName", seller.getDisplayName())
-                .setParameter("lat", seller.getAddress().getLocation().getGeoCoordinates().getLatitude())
-                .setParameter("long", seller.getAddress().getLocation().getGeoCoordinates().getLongitude())
-                .setParameter("city", seller.getAddress().getLocation().getCity())
-                .setParameter("country", seller.getAddress().getLocation().getCountry())
-                .setParameter("state", seller.getAddress().getLocation().getState())
-                .setParameter("number", seller.getAddress().getLocation().getNumber())
-                .setParameter("zip", seller.getAddress().getLocation().getZipCode())
-                .setParameter("street", seller.getAddress().getLocation().getStreetAddress())
+                .setParameter("lat", geoCoordinates.getLatitude())
+                .setParameter("long", geoCoordinates.getLongitude())
+                .setParameter("city", location.getCity())
+                .setParameter("country", location.getCountry())
+                .setParameter("state", location.getState())
+                .setParameter("number", location.getNumber())
+                .setParameter("zip", location.getZipCode())
+                .setParameter("street", location.getStreetAddress())
                 .setParameter("creator", seller.getCreatorId())
                 .setParameter("status", seller.getStatus().name())
-                .setParameter("createAt", seller.getAudit().getCreateAt())
-                .setParameter("updateAt", seller.getAudit().getUpdateAt())
+                .setParameter("createAt", audit.getCreateAt())
+                .setParameter("updateAt", audit.getUpdateAt())
                 .executeUpdate();
+    }
 
-        // TODO Review:
-        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertContract
-        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
-        String contactTable = getTableName(countryCode, "_contact");
+    private void insertContact(String countryCode, Seller seller) {
+        String contactTable = getTableName(countryCode, DataBaseConstants.TABLE_CONTACT);
+
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO ")
+                .append(contactTable)
+                .append(" (type, value, seller_code) VALUES " +
+                        "(:type, :value, :sellerCode)");
+
+        executeContactInsert(seller, query);
+    }
+
+    private void executeContactInsert(Seller seller, StringBuilder query) {
         for (Contact contact : seller.getContacts()) {
-            entityManager.createNativeQuery(
-                            "INSERT INTO " + contactTable + " (type, value, seller_code) VALUES " +
-                                    "(:type, :value, :sellerCode)")
+            entityManager.createNativeQuery(query.toString())
                     .setParameter("type", contact.getType())
                     .setParameter("value", contact.getValue())
                     .setParameter("sellerCode", seller.getCode())
                     .executeUpdate();
         }
+    }
 
-        // TODO Review:
-        // 1. Para uma melhor clareza e manutencao, por favor avalie criar método separados: exemplo insertBusinessHour
-        // 2. Avalie usar StringBuilder.append invés de concatenar String com +
-        String businessHourTable = getTableName(countryCode, "_business_hour");
+    private void insertBusinessHour(String countryCode, Seller seller) {
+        String businessHourTable = getTableName(countryCode, DataBaseConstants.TABLE_BUSINESS_HOUR);
+
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO ")
+                .append(businessHourTable)
+                .append(" (day_of_week, open_at, close_at, seller_code) VALUES " +
+                        "(:dayOfWeek, :openAt, :closeAt, :sellerCode)");
+
+        executeBusinessHourInsert(seller, query);
+    }
+
+    private void executeBusinessHourInsert(Seller seller, StringBuilder query) {
         for (BusinessHour businessHour : seller.getBusinessHours()) {
-            entityManager.createNativeQuery(
-                            "INSERT INTO " + businessHourTable + " (day_of_week, open_at, close_at, seller_code) VALUES " +
-                                    "(:dayOfWeek, :openAt, :closeAt, :sellerCode)")
+            entityManager.createNativeQuery(query.toString())
                     .setParameter("dayOfWeek", businessHour.getDayOfWeek())
                     .setParameter("openAt", businessHour.getOpenAt())
                     .setParameter("closeAt", businessHour.getCloseAt())
                     .setParameter("sellerCode", seller.getCode())
                     .executeUpdate();
         }
-
-        return seller;
     }
 
-    // TODO Review:
-    //  1. Como o métooo retorna um boolean, avalie renomear para padrão java de método boolean ex.: isCodeExists
-    //  2. Retorne boolean invés de Boolean isso evita NullPointerException
-    //  3. Object result não está sendo usado, avalie remover
-    //  4. Avalie usar StringBuilder.append invés de concatenar String com +
-    public Boolean findByCode(String countryCode, String code) {
-        String tableName = getTableName(countryCode, "_seller");
+    public boolean isCodeExists(String countryCode, String code) {
+        String tableName = getTableName(countryCode, DataBaseConstants.TABLE_SELLER);
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT 1 FROM ")
+                .append(tableName)
+                .append(" WHERE identification_code = :code");
+
         try {
-            Object result = entityManager.createNativeQuery(
-                            "SELECT 1 FROM " + tableName + " WHERE code = :code")
+            entityManager.createNativeQuery(query.toString())
                     .setParameter("code", code)
                     .getSingleResult();
 
@@ -98,7 +130,6 @@ public class SellerRepository implements ISellerRepository {
         } catch (NoResultException e) {
             return false;
         }
-
     }
 
     private String getTableName(String countryCode, String tableSuffix) {

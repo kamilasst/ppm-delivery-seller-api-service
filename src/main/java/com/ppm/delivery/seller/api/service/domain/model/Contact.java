@@ -1,12 +1,12 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,18 +14,17 @@ import java.util.StringJoiner;
 @Builder
 public class Contact {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "type", nullable = false, length = 50)
+    @NotNull(message = "Type cannot be null")
+    @Size(min = 2, max = 50, message = "Type must be between 2 and 50 characters")
     private String type;
 
-    @Column(name = "value", nullable = false, length = 100)
+    @NotNull(message = "Value cannot be null")
+    @Size(min = 1, max = 100, message = "Value must be between 1 and 100 characters")
     private String value;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
+    @NotNull(message = "Seller cannot be null")
     private Seller seller;
 
     @Override

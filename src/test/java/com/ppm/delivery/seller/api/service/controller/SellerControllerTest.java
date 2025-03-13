@@ -29,9 +29,8 @@ public class SellerControllerTest {
     @InjectMocks
     private SellerController sellerController;
 
-    // TODO Review: Por favor avalie renomear o método para shouldCreateSellerSuccessfully com intuito de manter o padrao
     @Test
-    void testShouldCreateSellerSuccessfully(){
+    void shouldCreateSellerSuccessfully(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
         Seller seller = SellerBuilder.create(request);
@@ -47,9 +46,8 @@ public class SellerControllerTest {
 
     }
 
-    // TODO Review: Por favor avalie renomear o método para shouldCreateSellerSuccessfully com intuito de manter o padrao
     @Test
-    void testShouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
+    void shouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
 

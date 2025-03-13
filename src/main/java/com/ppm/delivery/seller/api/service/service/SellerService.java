@@ -48,7 +48,7 @@ public class SellerService implements ISellerService {
     }
 
     private void validateIdentificationCode(String countryCode, String code) {
-        if (sellerRepository.findByCode(countryCode, code)){
+        if (sellerRepository.isCodeExists(countryCode, code)){
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
         }
     }
