@@ -2,6 +2,9 @@ package com.ppm.delivery.seller.api.service.domain.model;
 
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -9,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,39 +20,40 @@ import java.util.Objects;
 @ToString
 public class Seller {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "code", nullable = false, unique = true)
+    @NotNull(message = "Code is required")
+    @Size(max = 255, message = "Code cannot be longer than 255 characters")
     private String code;
 
-    @Embedded
+    @Valid
     private Identification identification;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @NotNull(message = "Name is required")
+    @Size(max = 100, message = "Name cannot be longer than 100 characters")
     private String name;
 
-    @Column(name = "display_name", nullable = false, length = 100)
+    @NotNull(message = "Display name is required")
     private String displayName;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Valid
     private List<Contact> contacts = new ArrayList<>();
 
-    @Embedded
+    @Valid
     private Address address;
 
-    @Column(name = "creator_id", nullable = false, length = 100)
+    @NotNull(message = "Creator ID is required")
+    @Size(max = 255, message = "Creator ID cannot be longer than 100 characters")
     private String creatorId;
 
+    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
     private Status status;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Valid
     private List<BusinessHour> businessHours = new ArrayList<>();
 
-    @Embedded
+    @Valid
     private Audit audit;
 
     @Override

@@ -8,6 +8,7 @@ import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
+import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,11 +38,10 @@ public class SellerServiceTest {
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
         Seller seller = SellerBuilder.create(request);
 
-        // TODO Review: Por favor avalie criar uma classe de constants. ex.: ConstantsMocks.COUNTRY_CODE_BR
-        String countryCode = "BR";
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
-        Mockito.when(sellerRepository.findByCode(countryCode, request.identification().code())).thenReturn(false);
+        Mockito.when(sellerRepository.isCodeExists(countryCode, request.identification().code())).thenReturn(false);
         Mockito.when(sellerRepository.save(Mockito.eq(countryCode), Mockito.any(Seller.class)))
                 .thenAnswer(invocation -> {
                     Seller sellerToSave = invocation.getArgument(1);
@@ -71,10 +71,10 @@ public class SellerServiceTest {
     void shouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        String countryCode = "BR";
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
-        Mockito.when(sellerRepository.findByCode(countryCode, request.identification().code())).thenReturn(true);
+        Mockito.when(sellerRepository.isCodeExists(countryCode, request.identification().code())).thenReturn(true);
 
         Assertions.assertThrows(BusinessException.class, () ->{
             sellerService.create(request);
