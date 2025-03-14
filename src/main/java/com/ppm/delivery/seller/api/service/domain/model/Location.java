@@ -1,6 +1,9 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.*;
 
 import java.util.Objects;
@@ -9,29 +12,32 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 @Builder
 @ToString
 public class Location {
 
-    @NotNull(message = "GeoCOordinates cannot be null")
+    @Embedded
+    @AttributeOverride(name = "latitude", column = @Column(name = "location_latitude"))
+    @AttributeOverride(name = "longitude", column = @Column(name = "location_longitude"))
     private GeoCoordinates geoCoordinates;
 
-    @NotNull(message = "City is required")
+    @Column(name = "city", length = 100, nullable = false)
     private String city;
 
-    @NotNull(message = "Country is required")
+    @Column(name = "country", length = 100, nullable = false)
     private String country;
 
-    @NotNull(message = "State is required")
+    @Column(name = "state", length = 100, nullable = false)
     private String state;
 
-    @NotNull(message = "Number is required")
+    @Column(name = "number", length = 10, nullable = false)
     private String number;
 
-    @NotNull(message = "Zip Code is required")
+    @Column(name = "zip_code", length = 10, nullable = false)
     private String zipCode;
 
-    @NotNull(message = "Street Address is required")
+    @Column(name = "street_address", length = 255, nullable = false)
     private String streetAddress;
 
     @Override

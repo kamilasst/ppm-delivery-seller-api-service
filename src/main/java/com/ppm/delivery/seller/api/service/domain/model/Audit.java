@@ -1,5 +1,7 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -9,13 +11,15 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 @Builder
 @ToString
 public class Audit {
 
-    @NotNull(message = "Create date cannot be null")
+    @Column(name = "create_at", nullable = false, updatable = false)
     private String createAt;
 
+    @Column(name = "update_at")
     private String updateAt;
 
     @Override

@@ -33,22 +33,23 @@ public class SellerService implements ISellerService {
 
         final String countryCode = contextHolder.getCountry();
 
-        validateIdentificationCode(countryCode, sellerDTORequest.identification().code());
+        validateIdentificationCode(sellerDTORequest.identification().code());
 
         Seller seller = SellerMapper.INSTANCE.toEntity(sellerDTORequest);
         seller.setCode(UUID.randomUUID().toString());
+        seller.setCountryCode(countryCode);
         seller.setStatus(Status.PENDING);
         seller.setAudit(Audit.builder().createAt(DateFormatterUtil.format(Instant.now())).build());
         seller.getContacts().forEach(contact -> contact.setSeller(seller));
         seller.getBusinessHours().forEach(businessHour -> businessHour.setSeller(seller));
 
-        Seller sellerSaved = sellerRepository.save(countryCode, seller);
+        Seller sellerSaved = sellerRepository.save(seller);
 
         return new SellerDTOResponse(sellerSaved.getCode(), sellerSaved.getStatus(), sellerSaved.getAudit().getCreateAt());
     }
 
-    private void validateIdentificationCode(String countryCode, String code) {
-        if (sellerRepository.isCodeExists(countryCode, code)){
+    private void validateIdentificationCode(String IdentificationCode) {
+        if (sellerRepository.existsByIdentificationCode(IdentificationCode)){
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
         }
     }

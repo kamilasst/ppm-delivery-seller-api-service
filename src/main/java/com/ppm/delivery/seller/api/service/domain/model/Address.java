@@ -1,5 +1,7 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -9,11 +11,12 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 @Builder
 @ToString
 public class Address {
 
-    @NotNull(message = "Location cannot be null")
+    @Embedded
     private Location location;
 
     @Override

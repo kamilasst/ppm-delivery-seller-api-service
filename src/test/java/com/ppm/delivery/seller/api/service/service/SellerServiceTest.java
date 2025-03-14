@@ -41,10 +41,10 @@ public class SellerServiceTest {
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
-        Mockito.when(sellerRepository.isCodeExists(countryCode, request.identification().code())).thenReturn(false);
-        Mockito.when(sellerRepository.save(Mockito.eq(countryCode), Mockito.any(Seller.class)))
+        Mockito.when(sellerRepository.existsByIdentificationCode(seller.getIdentification().getCode())).thenReturn(false);
+        Mockito.when(sellerRepository.save(Mockito.any(Seller.class)))
                 .thenAnswer(invocation -> {
-                    Seller sellerToSave = invocation.getArgument(1);
+                    Seller sellerToSave = invocation.getArgument(0);
                     sellerToSave.setCode(UUID.randomUUID().toString());
                     return sellerToSave;
                 });
@@ -57,7 +57,7 @@ public class SellerServiceTest {
         seller.setStatus(response.status());
         seller.getAudit().setCreateAt(response.createDate());
 
-        Mockito.verify(sellerRepository).save(Mockito.eq(countryCode), sellerCaptor.capture());
+        Mockito.verify(sellerRepository).save(sellerCaptor.capture());
 
         Seller savedSeller = sellerCaptor.getValue();
         Assertions.assertEquals(savedSeller.getCode(), response.code());
@@ -71,16 +71,17 @@ public class SellerServiceTest {
     void shouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
+        Seller seller = SellerBuilder.create(request);
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
-        Mockito.when(sellerRepository.isCodeExists(countryCode, request.identification().code())).thenReturn(true);
+        Mockito.when(sellerRepository.existsByIdentificationCode(seller.getIdentification().getCode())).thenReturn(true);
 
         Assertions.assertThrows(BusinessException.class, () ->{
             sellerService.create(request);
         });
 
-        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.eq(countryCode), Mockito.any(Seller.class));
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
     }
 
 }
