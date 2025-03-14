@@ -1,7 +1,7 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.util.Objects;
@@ -10,16 +10,15 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 @Builder
 @ToString
 public class GeoCoordinates {
 
-    @NotNull(message = "Latitude is required")
-    @Size(max = 50, message = "Latitude cannot be longer than 50 characters")
+    @Column(name = "latitude", length = 50)
     private String latitude;
 
-    @NotNull(message = "Longitude is required")
-    @Size(max = 50, message = "Longitude cannot be longer than 50 characters")
+    @Column(name = "longitude", length = 50)
     private String longitude;
 
     @Override

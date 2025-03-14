@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -7,6 +8,7 @@ import lombok.*;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,22 +16,21 @@ import java.util.StringJoiner;
 @Builder
 public class BusinessHour {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotNull(message = "Day of week cannot be null")
-    @Pattern(regexp = "^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)$",
-            message = "Day of week must be a valid day of the week (e.g., sunday, monday, etc.)")
+    @Column(name = "day_of_week", nullable = false)
     private String dayOfWeek;
 
-    @NotNull(message = "Open time cannot be null")
-    @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$", message = "Open time must be in HH:mm:ss format")
+    @Column(name = "open_at", nullable = false)
     private String openAt;
 
-    @NotNull(message = "Close time cannot be null")
-    @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)$", message = "Close time must be in HH:mm:ss format")
+    @Column(name = "close_at", nullable = false)
     private String closeAt;
 
-    @NotNull(message = "Seller cannot be null")
+    @ManyToOne
+    @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
     private Seller seller;
 
     @Override

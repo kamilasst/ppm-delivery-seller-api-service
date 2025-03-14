@@ -1,7 +1,7 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.util.Objects;
@@ -10,16 +10,15 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 @Builder
 @ToString
 public class Identification {
 
-    @NotNull(message = "Identification type is required")
-    @Size(max = 50, message = "Identification type cannot be longer than 50 characters")
+    @Column(name = "identification_type", nullable = false)
     private String type;
 
-    @NotNull(message = "Identification code is required")
-    @Size(min = 14, max = 14, message = "Identification code must be exactly 14 characters")
+    @Column(name = "identification_code", nullable = false, unique = true)
     private String code;
 
     @Override
