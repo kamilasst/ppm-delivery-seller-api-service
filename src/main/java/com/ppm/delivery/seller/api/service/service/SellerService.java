@@ -43,9 +43,9 @@ public class SellerService implements ISellerService {
         seller.getContacts().forEach(contact -> contact.setSeller(seller));
         seller.getBusinessHours().forEach(businessHour -> businessHour.setSeller(seller));
 
-        Seller sellerSaved = sellerRepository.save(seller);
+        sellerRepository.save(seller);
 
-        return new SellerDTOResponse(sellerSaved.getCode(), sellerSaved.getStatus(), sellerSaved.getAudit().getCreateAt());
+        return new SellerDTOResponse(seller.getCode(), seller.getStatus(), seller.getAudit().getCreateAt());
     }
 
     private void validateIdentificationCode(String IdentificationCode) {
