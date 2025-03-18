@@ -52,6 +52,7 @@ public class Seller {
     @Embedded
     private Audit audit;
 
+    // TODO atg - Review adicionar countryCode no equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,6 +69,7 @@ public class Seller {
                 Objects.equals(new HashSet<>(businessHours), new HashSet<>(seller.businessHours));
     }
 
+    // TODO atg - Review adicionar hashCode no equals
     @Override
     public int hashCode() {
         return Objects.hash(code, identification, name, displayName, contacts, address, creatorId, status, businessHours);

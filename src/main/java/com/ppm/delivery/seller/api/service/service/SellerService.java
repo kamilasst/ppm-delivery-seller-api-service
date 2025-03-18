@@ -53,6 +53,7 @@ public class SellerService implements ISellerService {
         return new SellerDTOResponse(seller.getCode(), seller.getStatus(), seller.getAudit().getCreateAt());
     }
 
+
     @Override
     public SellerUpdateDTOResponse update(String code, SellerUpdateDTORequest sellerUpdateDTORequest) {
 
@@ -72,6 +73,8 @@ public class SellerService implements ISellerService {
                 businessHoursDTO
         );
     }
+
+    // TODO atg Review Renomear identificationCode
 
     private void validateIdentificationCode(String IdentificationCode) {
         if (sellerRepository.existsByIdentificationCode(IdentificationCode)){
