@@ -9,5 +9,6 @@ public interface SellerRepository extends JpaRepository<Seller, String> {
 
     // TODO atg Review Renomear for identificationCode
     boolean existsByIdentificationCode(String IdentificationCode);
+    Seller findByCode(String code);
 
 }
