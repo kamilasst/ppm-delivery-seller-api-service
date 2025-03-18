@@ -23,6 +23,7 @@ CREATE TABLE seller (
 CREATE INDEX idx_seller_country_code ON seller(country_code);
 
 CREATE TABLE contact (
+    id SERIAL PRIMARY KEY,
     type VARCHAR(50) NOT NULL,
     value VARCHAR(100) NOT NULL,
     seller_code VARCHAR(255) NOT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE contact (
 );
 
 CREATE TABLE business_hour (
+    id SERIAL PRIMARY KEY,
     day_of_week VARCHAR(20) NOT NULL,
     open_at VARCHAR(8) NOT NULL,
     close_at VARCHAR(8) NOT NULL,
