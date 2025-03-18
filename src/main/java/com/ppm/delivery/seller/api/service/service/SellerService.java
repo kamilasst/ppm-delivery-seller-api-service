@@ -48,6 +48,7 @@ public class SellerService implements ISellerService {
         return new SellerDTOResponse(sellerSaved.getCode(), sellerSaved.getStatus(), sellerSaved.getAudit().getCreateAt());
     }
 
+    // TODO atg Review Renomear identificationCode
     private void validateIdentificationCode(String IdentificationCode) {
         if (sellerRepository.existsByIdentificationCode(IdentificationCode)){
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);

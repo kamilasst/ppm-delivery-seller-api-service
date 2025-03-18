@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SellerRepository extends JpaRepository<Seller, String> {
 
+    // TODO atg Review Renomear for identificationCode
     boolean existsByIdentificationCode(String IdentificationCode);
 
 }
