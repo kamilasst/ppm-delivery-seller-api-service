@@ -1,7 +1,10 @@
 package com.ppm.delivery.seller.api.service.service;
 
+import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
 import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
 import com.ppm.delivery.seller.api.service.domain.model.Audit;
@@ -14,6 +17,8 @@ import com.ppm.delivery.seller.api.service.utils.DateFormatterUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,10 +53,38 @@ public class SellerService implements ISellerService {
         return new SellerDTOResponse(seller.getCode(), seller.getStatus(), seller.getAudit().getCreateAt());
     }
 
+    @Override
+    public SellerUpdateDTOResponse update(String code, SellerUpdateDTORequest sellerUpdateDTORequest) {
+
+        Seller seller = validateCode(code);
+
+        String updateAt = DateFormatterUtil.format(Instant.now());
+
+        sellerUpdateDTORequest.status().ifPresent(seller::setStatus);
+
+        List<BusinessHourDTORequest> businessHoursDTO = new ArrayList<>();
+        sellerUpdateDTORequest.businessHours().ifPresent(businessHoursDTO::addAll);
+
+        return new SellerUpdateDTOResponse(
+                seller.getCode(),
+                updateAt,
+                seller.getStatus(),
+                businessHoursDTO
+        );
+    }
+
     private void validateIdentificationCode(String IdentificationCode) {
         if (sellerRepository.existsByIdentificationCode(IdentificationCode)){
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
         }
+    }
+
+    private Seller validateCode(String code) {
+        Seller seller = sellerRepository.findByCode(code);
+        if (seller == null){
+            throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
+        }
+        return seller;
     }
 
 }

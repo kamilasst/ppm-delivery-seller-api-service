@@ -33,15 +33,7 @@ public class SellerController implements ISellerController{
 
     @Override
     public ResponseEntity<SellerUpdateDTOResponse> patchV1(String code, SellerUpdateDTORequest sellerUpdateDTO) {
-
-        String updateAt = DateFormatterUtil.format(Instant.now());
-
-        SellerUpdateDTOResponse response = new SellerUpdateDTOResponse(
-                code,
-                updateAt,
-                sellerUpdateDTO.status().orElse(null),
-                sellerUpdateDTO.businessHours().orElse(null)
-        );
+        SellerUpdateDTOResponse response = sellerService.update(code, sellerUpdateDTO);
         return ResponseEntity.ok(response);
     }
 

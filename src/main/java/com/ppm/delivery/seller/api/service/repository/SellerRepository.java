@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface SellerRepository extends JpaRepository<Seller, String> {
 
     boolean existsByIdentificationCode(String IdentificationCode);
+    Seller findByCode(String code);
 
 }
