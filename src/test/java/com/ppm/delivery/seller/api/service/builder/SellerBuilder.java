@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public class SellerBuilder {
 
+    // TODO atg - Review Receber o countryCode e setar no seller
     public static Seller create(SellerDTORequest request) {
         return Seller.builder()
                 .code(UUID.randomUUID().toString())
