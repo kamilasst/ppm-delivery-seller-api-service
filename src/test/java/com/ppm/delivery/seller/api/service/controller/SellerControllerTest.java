@@ -10,6 +10,7 @@ import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.service.SellerService;
+import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,8 @@ public class SellerControllerTest {
     void shouldCreateSellerSuccessfully(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        Seller seller = SellerBuilder.create(request);
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.create(countryCode, request);
         SellerDTOResponse response = SellerDTOResponseBuilder.create(seller);
 
         Mockito.when(sellerService.create(request)).thenReturn(response);

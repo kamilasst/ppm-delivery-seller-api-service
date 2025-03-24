@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,43 +37,43 @@ public class SellerServiceTest {
     void shouldCreateSellerSuccessfully(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        Seller seller = SellerBuilder.create(request);
-
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.create(countryCode, request);
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
         Mockito.when(sellerRepository.existsByIdentificationCode(seller.getIdentification().getCode())).thenReturn(false);
+
+        ArgumentCaptor<Seller> sellerCaptor = ArgumentCaptor.forClass(Seller.class);
         Mockito.when(sellerRepository.save(Mockito.any(Seller.class)))
                 .thenAnswer(invocation -> {
                     Seller sellerToSave = invocation.getArgument(0);
                     sellerToSave.setCode(UUID.randomUUID().toString());
+                    sellerToSave.getAudit().setCreatedAt(LocalDateTime.now());
                     return sellerToSave;
                 });
-
-        ArgumentCaptor<Seller> sellerCaptor = ArgumentCaptor.forClass(Seller.class);
 
         SellerDTOResponse response = sellerService.create(request);
 
         seller.setCode(response.code());
         seller.setStatus(response.status());
-        seller.getAudit().setCreateAt(response.createDate());
+        seller.getAudit().setCreatedAt(response.createdDate());
 
         Mockito.verify(sellerRepository).save(sellerCaptor.capture());
 
         Seller savedSeller = sellerCaptor.getValue();
         Assertions.assertEquals(savedSeller.getCode(), response.code());
         Assertions.assertEquals(savedSeller.getStatus(), response.status());
-        Assertions.assertEquals(savedSeller.getAudit().getCreateAt(), response.createDate());
+        Assertions.assertEquals(savedSeller.getAudit().getCreatedAt(), response.createdDate());
 
-      //  Assertions.assertEquals(savedSeller, seller);
+        Assertions.assertEquals(savedSeller, seller);
     }
 
     @Test
     void shouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        Seller seller = SellerBuilder.create(request);
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.create(countryCode, request);
 
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
         Mockito.when(sellerRepository.existsByIdentificationCode(seller.getIdentification().getCode())).thenReturn(true);

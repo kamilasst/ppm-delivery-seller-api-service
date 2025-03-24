@@ -35,7 +35,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
 
         // arrange
         SellerDTORequest sellerDTORequest = SellerDTORequestBuilder.createDefault();
-        Seller sellerByRequest = SellerBuilder.create(sellerDTORequest);
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller sellerByRequest = SellerBuilder.create(countryCode, sellerDTORequest);
 
         // act
         var resultActions = mockMvc

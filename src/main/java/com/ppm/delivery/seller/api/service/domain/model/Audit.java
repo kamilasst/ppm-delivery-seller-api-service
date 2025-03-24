@@ -2,38 +2,49 @@ package com.ppm.delivery.seller.api.service.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.PreUpdate;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
 @Builder
 @ToString
 public class Audit {
 
-    @Column(name = "create_at", nullable = false, updatable = false)
-    private String createAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @Column(name = "update_at")
-    private String updateAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public Audit() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Audit audit = (Audit) o;
-        return Objects.equals(createAt, audit.createAt) &&
-                Objects.equals(updateAt, audit.updateAt);
+        return Objects.equals(createdAt, audit.createdAt) &&
+                Objects.equals(updatedAt, audit.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createAt, updateAt);
+        return Objects.hash(createdAt, updatedAt);
     }
 
 }

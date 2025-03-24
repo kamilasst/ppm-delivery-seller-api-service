@@ -16,7 +16,7 @@ public interface ISellerController {
     @PostMapping("/create")
     ResponseEntity<SellerDTOResponse> create(@Valid @RequestBody SellerDTORequest code);
 
-    @PatchMapping("/{code}")
+    @PatchMapping("/patch/{code}")
     ResponseEntity<SellerUpdateDTOResponse> patchV1(@Valid @PathVariable String code, @RequestBody SellerUpdateDTORequest sellerUpdateDTO);
 
 }

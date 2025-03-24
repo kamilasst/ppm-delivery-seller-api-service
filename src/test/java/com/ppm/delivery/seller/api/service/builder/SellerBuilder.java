@@ -4,15 +4,16 @@ import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.domain.model.*;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SellerBuilder {
 
-    // TODO atg - Review Receber o countryCode e setar no seller
-    public static Seller create(SellerDTORequest request) {
+    public static Seller create(String countryCode, SellerDTORequest request) {
         return Seller.builder()
                 .code(UUID.randomUUID().toString())
+                .countryCode(countryCode)
                 .identification(Identification.builder()
                         .type(request.identification().type())
                         .code(request.identification().code())
@@ -49,7 +50,7 @@ public class SellerBuilder {
                                 .closeAt(businessHour.closeAt())
                                 .build())
                         .collect(Collectors.toList()))
-                .audit(Audit.builder().createAt("2025-02-21T12:00:00.000Z").build())
+                .audit(Audit.builder().createdAt(LocalDateTime.now()).build())
                 .build();
     }
 

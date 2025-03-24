@@ -1,8 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.Objects;
@@ -33,7 +31,8 @@ public class BusinessHour {
     @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
     private Seller seller;
 
-    // TODO atg Review: Adicionar audit - Lembrar script
+    @Embedded
+    private Audit audit;
 
     @Override
     public boolean equals(Object o) {

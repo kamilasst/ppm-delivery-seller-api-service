@@ -9,7 +9,7 @@ public class SellerDTOResponseBuilder {
         return SellerDTOResponse.builder()
                 .code(seller.getCode())
                 .status(seller.getStatus())
-                .createDate(seller.getAudit().getCreateAt())
+                .createdDate(seller.getAudit().getCreatedAt())
                 .build();
 
 

@@ -1,18 +1,18 @@
 package com.ppm.delivery.seller.api.service.api.domain.response;
 
-import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import lombok.Builder;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Builder
 public record SellerUpdateDTOResponse(
 
         String code,
-        String updateDate,
         Status status,
-        List<BusinessHourDTORequest> businessHours
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+        LocalDateTime updatedDate
 
 ) {
 }

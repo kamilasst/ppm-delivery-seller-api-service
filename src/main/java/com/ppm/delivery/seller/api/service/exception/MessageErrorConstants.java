@@ -5,4 +5,6 @@ public class MessageErrorConstants {
     public static final String ERROR_COUNTRY_REQUIRED_HEADER = "Country is required in the request header";
     public static final String ERROR_COUNTRY_NOT_SUPPORTED = "Country not supported: %s";
     public static final String ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS = "The identification code is already exists.";
+    public static final String ERROR_SELLER_NOT_FOUND = "Seller not found";
+
 }
