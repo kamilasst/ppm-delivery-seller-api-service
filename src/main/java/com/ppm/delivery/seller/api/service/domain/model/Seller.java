@@ -50,15 +50,17 @@ public class Seller {
     private List<BusinessHour> businessHours = new ArrayList<>();
 
     @Embedded
-    private Audit audit;
+    @Builder.Default
+    private Audit audit = new Audit();
 
-    // TODO atg - Review adicionar countryCode no equals
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Seller seller = (Seller) o;
         return Objects.equals(code, seller.code) &&
+                Objects.equals(countryCode, seller.countryCode) &&
                 Objects.equals(identification, seller.identification) &&
                 Objects.equals(name, seller.name) &&
                 Objects.equals(displayName, seller.displayName) &&
@@ -69,10 +71,9 @@ public class Seller {
                 Objects.equals(new HashSet<>(businessHours), new HashSet<>(seller.businessHours));
     }
 
-    // TODO atg - Review adicionar hashCode no equals
     @Override
     public int hashCode() {
-        return Objects.hash(code, identification, name, displayName, contacts, address, creatorId, status, businessHours);
+        return Objects.hash(code, countryCode, identification, name, displayName, contacts, address, creatorId, status, businessHours);
     }
 
 }

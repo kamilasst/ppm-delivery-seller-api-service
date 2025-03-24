@@ -4,11 +4,12 @@ import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SellerRepository extends JpaRepository<Seller, String> {
 
-    // TODO atg Review Renomear for identificationCode
-    boolean existsByIdentificationCode(String IdentificationCode);
-    Seller findByCode(String code);
+    boolean existsByIdentificationCode(String identificationCode);
+    Optional<Seller> findByCode(String code);
 
 }

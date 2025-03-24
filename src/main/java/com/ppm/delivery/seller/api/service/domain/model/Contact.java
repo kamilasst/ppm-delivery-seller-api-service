@@ -30,7 +30,8 @@ public class Contact {
     @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
     private Seller seller;
 
-    // TODO atg Review: Adicionar audit - Lembrar script
+    @Embedded
+    private Audit audit;
 
     @Override
     public boolean equals(Object o) {

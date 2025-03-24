@@ -1,6 +1,7 @@
 package com.ppm.delivery.seller.api.service.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public abstract class AbstractComponentTest {
     @BeforeEach
     public void setUp() {
         objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
     }
 
 }
