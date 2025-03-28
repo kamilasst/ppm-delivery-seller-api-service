@@ -126,7 +126,7 @@ public class SellerServiceTest {
         Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.of(seller));
         Mockito.when(sellerRepository.save(Mockito.any(Seller.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<BusinessHourDTORequest> mutableList = List.of(
+        List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
                         .openAt("08:30:00")
@@ -137,9 +137,8 @@ public class SellerServiceTest {
                         .closeAt("18:00:00").build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
-                .businessHours(mutableList)
+                .businessHours(businessHoursList )
                 .build();
-
 
         //Act
         SellerUpdateDTOResponse response = sellerService.update(seller.getCode(), sellerUpdateDTORequest);
@@ -169,60 +168,58 @@ public class SellerServiceTest {
         Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
     }
 
-//    @Test
-//    void shouldUpdateSellerStatusAndBusinessHoursSuccessfully() {
-//        String sellerCode = "1234";
-//        LocalDateTime beforeUpdate = LocalDateTime.now().minusDays(1);
-//
-//        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-//        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-//
-//        Seller seller = SellerBuilder.create(countryCode, request);
-//        seller.setCode(sellerCode);
-//        seller.setStatus(Status.PENDING);
-//        seller.setAudit(new Audit(beforeUpdate, null));
-//
-//        List<BusinessHourDTORequest> newBusinessHoursDTO = List.of(
-//                new BusinessHourDTORequest("SUNDAY", "08:30:00", "17:30:00"),
-//                new BusinessHourDTORequest("MONDAY", "09:00:00", "18:00:00")
-//        );
-//
-//        // Atualizando o status e os business hours
-//        SellerUpdateDTORequest sellerUpdateDTORequest = new SellerUpdateDTORequest(
-//                Optional.of(Status.ACTIVE),
-//                Optional.of(newBusinessHoursDTO)
-//        );
-//
-//        Mockito.when(sellerRepository.findByCode(sellerCode)).thenReturn(Optional.of(seller));
-//        Mockito.when(sellerRepository.save(Mockito.any(Seller.class))).thenAnswer(invocation -> invocation.getArgument(0));
-//
-//        SellerUpdateDTOResponse response = sellerService.update(sellerCode, sellerUpdateDTORequest);
-//
-//        Assertions.assertNotNull(response);
-//        Assertions.assertEquals(sellerCode, response.code());
-//        Assertions.assertEquals(Status.ACTIVE, response.status());  // O status deve ter sido alterado para ACTIVE
-//        Assertions.assertNotNull(response.updatedDate());
-//        Assertions.assertTrue(response.updatedDate().isAfter(beforeUpdate));  // A data de atualização deve ser após a data original
-//
-//        // Verifica se os horários de funcionamento foram atualizados corretamente
-//        Assertions.assertEquals(2, seller.getBusinessHours().size());  // Verifica que dois horários de funcionamento foram atualizados
-//
-//        // Verificando os horários de funcionamento atualizados para o domingo
-//        BusinessHour updatedSunday = seller.getBusinessHours().stream()
-//                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
-//                .findFirst().orElseThrow();
-//        Assertions.assertEquals("08:30:00", updatedSunday.getOpenAt());
-//        Assertions.assertEquals("17:30:00", updatedSunday.getCloseAt());
-//
-//        // Verificando os horários de funcionamento atualizados para a segunda-feira
-//        BusinessHour updatedMonday = seller.getBusinessHours().stream()
-//                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
-//                .findFirst().orElseThrow();
-//        Assertions.assertEquals("09:00:00", updatedMonday.getOpenAt());
-//        Assertions.assertEquals("18:00:00", updatedMonday.getCloseAt());
-//
-//        Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);  // Verifica se o save foi chamado uma vez
-//    }
+    @Test
+    void shouldUpdateSellerStatusAndBusinessHoursSuccessfully() {
+
+        //Arrange
+        Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRepository.save(Mockito.any(Seller.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<BusinessHourDTORequest> businessHoursList  = List.of(
+                BusinessHourDTORequest.builder()
+                        .dayOfWeek("SUNDAY")
+                        .openAt("08:30:00")
+                        .closeAt("17:30:00").build(),
+                BusinessHourDTORequest.builder()
+                        .dayOfWeek("MONDAY")
+                        .openAt("09:00:00")
+                        .closeAt("18:00:00").build());
+
+        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+                .status(Status.ACTIVE)
+                .businessHours(businessHoursList )
+                .build();
+
+        //Act
+        SellerUpdateDTOResponse response = sellerService.update(seller.getCode(), sellerUpdateDTORequest);
+
+        //Assert
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(seller.getCode(), response.code());
+        Assertions.assertEquals(Status.ACTIVE, response.status());
+        Assertions.assertNotNull(response.updatedDate());
+        Assertions.assertTrue(response.updatedDate().isAfter(seller.getAudit().getCreatedAt()));
+
+        Assertions.assertEquals(2, seller.getBusinessHours().size());
+
+        BusinessHour updatedSunday = seller.getBusinessHours().stream()
+                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
+                .findFirst().orElseThrow();
+        Assertions.assertEquals("08:30:00", updatedSunday.getOpenAt());
+        Assertions.assertEquals("17:30:00", updatedSunday.getCloseAt());
+
+        BusinessHour updatedMonday = seller.getBusinessHours().stream()
+                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
+                .findFirst().orElseThrow();
+        Assertions.assertEquals("09:00:00", updatedMonday.getOpenAt());
+        Assertions.assertEquals("18:00:00", updatedMonday.getCloseAt());
+
+        Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
+        Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
+
+    }
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenSellerIsNotFound() {
