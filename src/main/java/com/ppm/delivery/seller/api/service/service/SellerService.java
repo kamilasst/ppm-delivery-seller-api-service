@@ -15,9 +15,11 @@ import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,7 +62,9 @@ public class SellerService implements ISellerService {
         validateExist(sellerOptional);
 
         Seller seller = sellerOptional.get();
-        sellerUpdateDTORequest.status().ifPresent(seller::setStatus);
+        if (Objects.nonNull(sellerUpdateDTORequest.status())) {
+            seller.setStatus(sellerUpdateDTORequest.status());
+        }
 
         updateBusinessHour(sellerUpdateDTORequest, seller);
 
@@ -74,10 +78,12 @@ public class SellerService implements ISellerService {
     }
 
     private static void updateBusinessHour(SellerUpdateDTORequest sellerUpdateDTORequest, Seller seller) {
-        sellerUpdateDTORequest.businessHours().ifPresent(newBusinessHoursDTO -> {
+
+        if (!CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours())) {
+
             List<BusinessHour> existingBusinessHours = seller.getBusinessHours();
 
-            for (BusinessHourDTORequest dto : newBusinessHoursDTO) {
+            for (BusinessHourDTORequest dto : sellerUpdateDTORequest.businessHours()) {
                 Optional<BusinessHour> existing = existingBusinessHours.stream()
                         .filter(bh -> bh.getDayOfWeek().equals(dto.dayOfWeek()))
                         .findFirst();
@@ -96,7 +102,7 @@ public class SellerService implements ISellerService {
                     existingBusinessHours.add(newBusinessHour);
                 }
             }
-        });
+        }
     }
 
     private void validateIdentificationCode(String identificationCode) {
