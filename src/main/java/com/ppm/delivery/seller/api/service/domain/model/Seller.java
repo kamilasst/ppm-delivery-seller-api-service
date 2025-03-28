@@ -47,7 +47,7 @@ public class Seller {
     private Status status;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<BusinessHour> businessHours = new ArrayList<>();
+    private List<BusinessHour> businessHours;
 
     @Embedded
     @Builder.Default

@@ -36,9 +36,9 @@ public final class SellerDTORequestBuilder {
                         .build()).
                 creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637").
                 businessHours(List.of(BusinessHourDTORequest.builder().
-                        dayOfWeek("Monday").
-                        openAt("9:00").
-                        closeAt("18:00").
+                        dayOfWeek("SUNDAY").
+                        openAt("00:00:00").
+                        closeAt("23:59:00").
                         build()))
                 .build();
     }

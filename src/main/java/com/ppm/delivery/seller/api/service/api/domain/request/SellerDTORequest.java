@@ -10,8 +10,9 @@ import java.util.List;
 
 @Builder
 public record SellerDTORequest(
-        @Valid
+
         @NotNull(message = "Identification is required")
+        @Valid
         IdentificationDTORequest identification,
         @NotBlank(message = "Name is required")
         @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -20,11 +21,12 @@ public record SellerDTORequest(
         @Size(min = 2, max = 100, message = "DisplayName must be between 2 and 100 characters")
         String displayName,
         @NotNull(message = "Contacts are required")
-        @Valid
         @Size(min = 1, message = "At least one contact is required")
-        List<ContactDTORequest> contacts,
         @Valid
+        List<ContactDTORequest> contacts,
+
         @NotNull(message = "Address is required")
+        @Valid
         AddressDTORequest address,
         @NotBlank(message = "CreatorId is required")
         String creatorId,
