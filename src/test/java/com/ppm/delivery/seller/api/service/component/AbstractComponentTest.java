@@ -3,6 +3,7 @@ package com.ppm.delivery.seller.api.service.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,13 +17,16 @@ public abstract class AbstractComponentTest {
     @Autowired
     protected MockMvc mockMvc;
 
-    protected ObjectMapper objectMapper;
+    protected static ObjectMapper objectMapper;
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUpOnce() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-
+    }
+    @BeforeEach
+    public void setUp() {
+        sellerRepository.deleteAll();
     }
 
 }
