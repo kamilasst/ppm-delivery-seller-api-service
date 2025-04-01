@@ -12,7 +12,7 @@ public class SellerBuilder {
 
     public static Seller createDefault(String countryCode){
 
-        return Seller.builder()
+        Seller seller = Seller.builder()
                 .code(UUID.randomUUID().toString())
                 .countryCode(countryCode)
                 .identification(Identification.builder()
@@ -51,6 +51,10 @@ public class SellerBuilder {
                         .build())
                 .build();
 
+        seller.getContacts().forEach(contact -> contact.setSeller(seller));
+        seller.getBusinessHours().forEach(businessHour -> businessHour.setSeller(seller));
+
+        return seller;
     }
 
     public static Seller create(String countryCode, SellerDTORequest request) {

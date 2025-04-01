@@ -2,11 +2,14 @@ package com.ppm.delivery.seller.api.service.builder;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class SellerDTORequestBuilder {
 
-    private SellerDTORequestBuilder(){}
+    private SellerDTORequestBuilder() {
+    }
 
     public static SellerDTORequest createDefault() {
         return SellerDTORequest.builder()
@@ -33,13 +36,13 @@ public final class SellerDTORequestBuilder {
                                 .zipCode("51021-200")
                                 .streetAddress("Avenida Henrique Gonçalves Baptista")
                                 .build())
-                        .build()).
-                creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637").
-                businessHours(List.of(BusinessHourDTORequest.builder().
-                        dayOfWeek("SUNDAY").
-                        openAt("00:00:00").
-                        closeAt("23:59:00").
-                        build()))
+                        .build())
+                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
+                .businessHours(new ArrayList<>(Arrays.asList(BusinessHourDTORequest.builder()
+                        .dayOfWeek("SUNDAY")
+                        .openAt("00:00:00")
+                        .closeAt("23:59:00")
+                        .build())))
                 .build();
     }
 

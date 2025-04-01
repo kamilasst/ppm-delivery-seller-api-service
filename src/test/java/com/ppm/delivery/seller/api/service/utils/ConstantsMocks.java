@@ -8,5 +8,10 @@ public class ConstantsMocks {
     public static final String COUNTRY_CODE_MX = "MX";
     public static final String COUNTRY_CODE_PY = "PY";
     public static final String COUNTRY_CODE_US = "US";
+    public static final String EXPECTED_OPEN_AT_1 = "08:30:00";
+    public static final String EXPECTED_OPEN_AT_2 = "09:00:00";
+    public static final String EXPECTED_CLOSE_AT_1 = "17:30:00";
+    public static final String EXPECTED_CLOSE_AT_2 = "18:00:00";
+
 
 }
