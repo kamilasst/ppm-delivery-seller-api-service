@@ -3,6 +3,7 @@ package com.ppm.delivery.seller.api.service.builder;
 import com.ppm.delivery.seller.api.service.api.domain.request.*;
 import com.ppm.delivery.seller.api.service.domain.model.*;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
+import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -43,8 +44,8 @@ public class SellerBuilder {
                 status(Status.PENDING).
                 businessHours(new ArrayList<>(Arrays.asList(BusinessHour.builder().
                         dayOfWeek("SUNDAY").
-                        openAt("00:00:00").
-                        closeAt("23:59:00").
+                        openAt(ConstantsMocks.EXPECTED_OPEN_AT_1).
+                        closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).
                         build()))).
                 audit(Audit.builder()
                         .createdAt(LocalDateTime.now())

@@ -110,12 +110,12 @@ public class SellerControllerTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -144,12 +144,12 @@ public class SellerControllerTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)

@@ -11,8 +11,8 @@ import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
-import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
+import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.SellerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -58,6 +58,8 @@ public class SellerService implements ISellerService {
     @Override
     public SellerUpdateDTOResponse update(String code, SellerUpdateDTORequest sellerUpdateDTORequest) {
 
+        validateUpdateRequest(sellerUpdateDTORequest);
+
         Optional<Seller> sellerOptional = sellerRepository.findByCode(code);
         validateExist(sellerOptional);
 
@@ -65,15 +67,12 @@ public class SellerService implements ISellerService {
         if (Objects.nonNull(sellerUpdateDTORequest.status())) {
             seller.setStatus(sellerUpdateDTORequest.status());
         }
-
         updateBusinessHour(sellerUpdateDTORequest, seller);
+        updateAuditTimestamp(seller);
 
-        LocalDateTime updateAt = LocalDateTime.now();
-        seller.getAudit().setUpdatedAt(updateAt);
+        Seller savedSeller = sellerRepository.save(seller);
 
-        Seller sevedSeller = sellerRepository.save(seller);
-
-        return new SellerUpdateDTOResponse(sevedSeller.getCode(), sevedSeller.getStatus(), sevedSeller.getAudit().getUpdatedAt());
+        return new SellerUpdateDTOResponse(savedSeller.getCode(), savedSeller.getStatus(), savedSeller.getAudit().getUpdatedAt());
 
     }
 
@@ -115,6 +114,23 @@ public class SellerService implements ISellerService {
         if (optionalSeller.isEmpty()){
             throw new EntityNotFoundException(MessageErrorConstants.ERROR_SELLER_NOT_FOUND);
         }
+    }
+
+    private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
+        if (Objects.isNull(sellerUpdateDTORequest)) {
+            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED);
+        }
+
+        boolean isStatusInvalid = Objects.isNull(sellerUpdateDTORequest.status());
+        boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours());
+
+        if (isStatusInvalid && isBusinessHoursInvalid) {
+            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED);
+        }
+    }
+
+    private void updateAuditTimestamp(Seller seller) {
+        seller.getAudit().setUpdatedAt(LocalDateTime.now());
     }
 
 }

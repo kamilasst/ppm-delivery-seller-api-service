@@ -26,7 +26,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class SellerServiceTest {
@@ -43,6 +46,7 @@ public class SellerServiceTest {
     @Test
     void shouldCreateSellerSuccessfully(){
 
+        //Arrange
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.create(countryCode, request);
@@ -59,8 +63,10 @@ public class SellerServiceTest {
                     return sellerToSave;
                 });
 
+        //Act
         SellerDTOResponse response = sellerService.create(request);
 
+        //Assert
         seller.setCode(response.code());
         seller.setStatus(response.status());
         seller.getAudit().setCreatedAt(response.createdDate());
@@ -78,6 +84,7 @@ public class SellerServiceTest {
     @Test
     void shouldThrowExceptionWhenIdentificationCodeAlreadyExists(){
 
+        //Arrange
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.create(countryCode, request);
@@ -85,8 +92,8 @@ public class SellerServiceTest {
         Mockito.when(contextHolder.getCountry()).thenReturn(countryCode);
         Mockito.when(sellerRepository.existsByIdentificationCode(seller.getIdentification().getCode())).thenReturn(true);
 
-        Assertions.assertThrows(BusinessException.class, () -> sellerService.create(request));
 
+        Assertions.assertThrows(BusinessException.class, () -> sellerService.create(request));
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
     }
 
@@ -128,12 +135,12 @@ public class SellerServiceTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList )
@@ -153,14 +160,14 @@ public class SellerServiceTest {
         BusinessHour updatedSunday = seller.getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_1, updatedSunday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_1, updatedSunday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedSunday.getCloseAt());
 
         BusinessHour newMonday = seller.getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, newMonday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, newMonday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, newMonday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, newMonday.getCloseAt());
 
         Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
@@ -178,12 +185,12 @@ public class SellerServiceTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .status(Status.ACTIVE)
@@ -205,14 +212,14 @@ public class SellerServiceTest {
         BusinessHour updatedSunday = seller.getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_1, updatedSunday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_1, updatedSunday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = seller.getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedMonday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedMonday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
 
         Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
@@ -221,14 +228,81 @@ public class SellerServiceTest {
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenSellerIsNotFound() {
+
+        //Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
 
         Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.empty());
 
+        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+                .status(Status.ACTIVE)
+                .build();
+
+        //Act e Assert
         EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class, () ->
-            sellerService.update(seller.getCode(), new SellerUpdateDTORequest(null, Collections.emptyList())));
+            sellerService.update(seller.getCode(), sellerUpdateDTORequest));
 
         Assertions.assertEquals(MessageErrorConstants.ERROR_SELLER_NOT_FOUND, exception.getMessage());
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenRequestIsNull() {
+
+        //Arrange
+        Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        //Act e Assert
+        BusinessException exception = Assertions.assertThrows(BusinessException.class,
+                () -> sellerService.update(seller.getCode(), null)
+        );
+
+        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED, exception.getMessage());
+        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
+
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenStatusAndBusinessHoursAreNull() {
+
+        //Arrange
+        Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .status(null)
+                .businessHours(null)
+                .build();
+
+        //Act e Assert
+        BusinessException exception = Assertions.assertThrows(BusinessException.class,
+                () -> sellerService.update(seller.getCode(), request)
+        );
+
+        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED, exception.getMessage());
+        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenStatusIsNullAndBusinessHoursIsEmpty() {
+
+        //Arrange
+        Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .status(null)
+                .businessHours(Collections.emptyList())
+                .build();
+
+        //Act e Assert
+        BusinessException exception = Assertions.assertThrows(BusinessException.class,
+                () -> sellerService.update(seller.getCode(), request)
+        );
+
+        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED, exception.getMessage());
+        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
     }
 
 }

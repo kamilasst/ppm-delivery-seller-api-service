@@ -13,6 +13,7 @@ import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
 import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
+import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -76,7 +77,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
 
         sellerRepository.saveAndFlush(seller);
 
-        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(Status.ACTIVE).build();
 
         //Act
@@ -85,7 +86,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         patch("/api/seller/patch/{code}", seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                                .content(objectMapper.writeValueAsString(sellerUpdateDTORequest)))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         //Assert
@@ -96,12 +97,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
 
-        assertEquals(sellerUpdateDTORequest.status(), response.status());
-        assertEquals(sellerUpdateDTORequest.status(), updatedSeller.get().getStatus());
+        assertEquals(request.status(), response.status());
+        assertEquals(request.status(), updatedSeller.get().getStatus());
     }
 
     @Test
     void shouldSuccessfullyPatchSellerBusinessHour() throws Exception {
+
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
@@ -111,14 +113,14 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
-        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
                 .build();
 
@@ -128,7 +130,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         patch("/api/seller/patch/{code}", seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                                .content(objectMapper.writeValueAsString(sellerUpdateDTORequest)))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Assert
@@ -145,14 +147,14 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_1, updatedSunday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_1, updatedSunday.getCloseAt());
+        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
+        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedMonday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedMonday.getCloseAt());
+        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
+        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
 
     }
 
@@ -168,14 +170,14 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("SUNDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_1)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).build(),
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek("MONDAY")
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build());
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
-        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
                 .status(Status.ACTIVE)
                 .build();
@@ -186,7 +188,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         patch("/api/seller/patch/{code}", seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                                .content(objectMapper.writeValueAsString(sellerUpdateDTORequest)))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         // Assert
@@ -197,37 +199,95 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
 
-        assertEquals(sellerUpdateDTORequest.status(), response.status());
-        assertEquals(sellerUpdateDTORequest.status(), updatedSeller.get().getStatus());
+        assertEquals(request.status(), response.status());
+        assertEquals(request.status(), updatedSeller.get().getStatus());
 
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_1, updatedSunday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_1, updatedSunday.getCloseAt());
+        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
+        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedMonday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedMonday.getCloseAt());
+        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
+        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
     }
 
     @Test
-    void shouldThrowEntityNotFoundExceptionWhenSellerCodeIsNotFound() throws Exception {
+    void shouldReturn404WhenSellerCodeIsNotFound() throws Exception {
 
         // Arrange
         String nonExistentCode = "123456";
-        SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(Status.ACTIVE).build();
 
         // Act & Assert
         mockMvc.perform(patch("/api/seller/patch/{code}", nonExistentCode)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .content(objectMapper.writeValueAsString(sellerUpdateDTORequest)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())  // Espera um status HTTP 404 (Not Found)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Seller not found"));  // Verifica a mensagem da exceção
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())  // Espera um status HTTP 404 (Not Found)
+                .andExpect(jsonPath("$.error").value("Seller not found"));  // Verifica a mensagem da exceção
+    }
+
+    @Test
+    void shouldReturn400WhenRequestIsNull() throws Exception {
+
+        // Arrange
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.createDefault(countryCode);
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .content("")) // corpo vazio = request null
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
+    }
+
+    @Test
+    void shouldReturn400WhenStatusAndBusinessHoursAreNull() throws Exception {
+
+        // Arrange
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.createDefault(countryCode);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .status(null)
+                .businessHours(null)
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
+    }
+
+    @Test
+    void shouldReturn400WhenStatusIsNullAndBusinessHoursIsEmpty() throws Exception {
+
+        // Arrange
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.createDefault(countryCode);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .status(null)
+                .businessHours(List.of())
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
     }
 
 }
