@@ -13,11 +13,10 @@ import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
-import com.ppm.delivery.seller.api.service.repository.SellerRepository;
+import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,12 +26,15 @@ import java.util.UUID;
 public class SellerService implements ISellerService {
 
     private final ContextHolder contextHolder;
-    private final SellerRepository sellerRepository;
+    private final ISellerRepository sellerRepository;
+    private final IPermissionService permissionService;
 
     public SellerService(final ContextHolder contextHolder,
-                         final SellerRepository sellerRepository){
+                         final ISellerRepository sellerRepository,
+                         final IPermissionService permissionService){
         this.contextHolder = contextHolder;
         this.sellerRepository = sellerRepository;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -62,18 +64,57 @@ public class SellerService implements ISellerService {
 
         Optional<Seller> sellerOptional = sellerRepository.findByCode(code);
         validateExist(sellerOptional);
+        validateUpdateStatus(sellerUpdateDTORequest.status());
 
         Seller seller = sellerOptional.get();
-        if (Objects.nonNull(sellerUpdateDTORequest.status())) {
-            seller.setStatus(sellerUpdateDTORequest.status());
-        }
+        updateStatus(sellerUpdateDTORequest, seller);
         updateBusinessHour(sellerUpdateDTORequest, seller);
-        updateAuditTimestamp(seller);
 
         Seller savedSeller = sellerRepository.save(seller);
 
-        return new SellerUpdateDTOResponse(savedSeller.getCode(), savedSeller.getStatus(), savedSeller.getAudit().getUpdatedAt());
+        return new SellerUpdateDTOResponse(
+                savedSeller.getCode(),
+                savedSeller.getStatus(),
+                savedSeller.getAudit().getUpdatedAt()
+        );
 
+    }
+
+    private void validateIdentificationCode(String identificationCode) {
+        if (sellerRepository.existsByIdentificationCode(identificationCode)){
+            throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
+
+        if (sellerUpdateDTORequest == null) {
+            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
+        }
+        boolean isStatusInvalid = Objects.isNull(sellerUpdateDTORequest.status());
+        boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours());
+
+        if (isStatusInvalid && isBusinessHoursInvalid) {
+            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
+        }
+    }
+
+    private void validateExist(Optional<Seller> optionalSeller) {
+        if (optionalSeller.isEmpty()){
+            throw new EntityNotFoundException(MessageErrorConstants.ERROR_SELLER_NOT_FOUND);
+        }
+    }
+
+    private void validateUpdateStatus(Status status) {
+        if (Objects.nonNull(status)) {
+            permissionService.validateAdminAccess();
+        }
+    }
+
+    private static void updateStatus(SellerUpdateDTORequest sellerUpdateDTORequest, Seller seller) {
+        if (Objects.nonNull(sellerUpdateDTORequest.status())) {
+            seller.setStatus(sellerUpdateDTORequest.status());
+        }
     }
 
     private static void updateBusinessHour(SellerUpdateDTORequest sellerUpdateDTORequest, Seller seller) {
@@ -102,35 +143,6 @@ public class SellerService implements ISellerService {
                 }
             }
         }
-    }
-
-    private void validateIdentificationCode(String identificationCode) {
-        if (sellerRepository.existsByIdentificationCode(identificationCode)){
-            throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
-        }
-    }
-
-    private void validateExist(Optional<Seller> optionalSeller) {
-        if (optionalSeller.isEmpty()){
-            throw new EntityNotFoundException(MessageErrorConstants.ERROR_SELLER_NOT_FOUND);
-        }
-    }
-
-    private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
-        if (Objects.isNull(sellerUpdateDTORequest)) {
-            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED);
-        }
-
-        boolean isStatusInvalid = Objects.isNull(sellerUpdateDTORequest.status());
-        boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours());
-
-        if (isStatusInvalid && isBusinessHoursInvalid) {
-            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED);
-        }
-    }
-
-    private void updateAuditTimestamp(Seller seller) {
-        seller.getAudit().setUpdatedAt(LocalDateTime.now());
     }
 
 }

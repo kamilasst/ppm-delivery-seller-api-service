@@ -8,16 +8,19 @@ import org.springframework.web.context.annotation.RequestScope;
 public class ContextHolder {
 
     private String country;
+    private String profile;
 
-    public void initializeContext(final String country) {
-        setCountry(country);
+    public void initializeContext(final String country, final String profile) {
+        this.country = country;
+        this.profile = profile;
     }
 
     public String getCountry() {
         return this.country;
     }
 
-    private void setCountry(final String country) {
-        this.country = country;
+    public String getProfile() {
+        return this.profile;
     }
+
 }

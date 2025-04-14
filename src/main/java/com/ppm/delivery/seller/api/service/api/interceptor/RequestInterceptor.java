@@ -39,8 +39,9 @@ public class RequestInterceptor implements HandlerInterceptor {
         final String userInfoProfile = request.getHeader(HeaderConstants.HEADER_USER_INFO_PROFILE);
         final String country = request.getHeader(HeaderConstants.HEADER_COUNTRY);
         final String platform = request.getHeader(HeaderConstants.HEADER_PLATFORM);
+        final String profile = request.getHeader(HeaderConstants.HEADER_PROFILE);
 
-        context.initializeContext(country);
+        context.initializeContext(country, profile);
 
         final Header header = new Header(
                 correlationId,
@@ -50,7 +51,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 type,
                 new Event(eventName, eventVersion),
                 new UserInfo(userInfoId, userInfoProfile),
-                new Metadata(country, platform)
+                new Metadata(country, platform, profile)
         );
 
         requestValidator.validate(header);

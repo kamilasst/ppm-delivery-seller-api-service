@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SellerRepository extends JpaRepository<Seller, String> {
+public interface ISellerRepository extends JpaRepository<Seller, String> {
 
     boolean existsByIdentificationCode(String identificationCode);
     Optional<Seller> findByCode(String code);

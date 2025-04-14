@@ -6,6 +6,7 @@ public class MessageErrorConstants {
     public static final String ERROR_COUNTRY_NOT_SUPPORTED = "Country not supported: %s";
     public static final String ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS = "The identification code is already exists";
     public static final String ERROR_SELLER_NOT_FOUND = "Seller not found";
-    public static final String ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED = "Status and business hours must be provided";
+    public static final String ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED = "Status or business hours are required";
+    public static final String ERROR_OPERATION_NOT_PERMITTED_FOR_THIS_PROFILE = "Operation is not permitted for the user's profile";
 
 }

@@ -4,7 +4,7 @@ import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
-import com.ppm.delivery.seller.api.service.service.SellerService;
+import com.ppm.delivery.seller.api.service.service.ISellerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/seller")
 public class SellerController implements ISellerController{
 
-    private final SellerService sellerService;
+    private final ISellerService sellerService;
 
-    public SellerController(SellerService sellerService){
+    public SellerController(ISellerService sellerService){
         this.sellerService = sellerService;
     }
 
