@@ -13,6 +13,7 @@ import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
 import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
+import com.ppm.delivery.seller.api.service.domain.profile.Profile;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +70,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     }
 
     @Test
-    void shouldSuccessfullyPatchSellerStatus() throws Exception {
+    void shouldSuccessfullyPatchSellerOnlyStatus() throws Exception {
 
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
@@ -86,6 +87,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         patch("/api/seller/patch/{code}", seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                                .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
@@ -102,7 +104,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     }
 
     @Test
-    void shouldSuccessfullyPatchSellerBusinessHour() throws Exception {
+    void shouldSuccessfullyPatchSellerOnlyBusinessHours() throws Exception {
 
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
@@ -158,8 +160,9 @@ class SellerServiceComponentTest extends AbstractComponentTest{
 
     }
 
+
     @Test
-    void shouldSuccessfullyPatchSellerStatusAndBusinessHour() throws Exception {
+    void shouldSuccessfullyPatchSellerStatusAndBusinessHours() throws Exception {
 
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
@@ -188,6 +191,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         patch("/api/seller/patch/{code}", seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                                .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
@@ -228,8 +232,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound())  // Espera um status HTTP 404 (Not Found)
-                .andExpect(jsonPath("$.error").value("Seller not found"));  // Verifica a mensagem da exceção
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Seller not found"));
     }
 
     @Test
@@ -243,9 +247,9 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .content("")) // corpo vazio = request null
+                        .content(""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
     @Test
@@ -266,7 +270,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
     @Test
@@ -287,7 +291,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_AND_BUSINESSHOUR_MUST_BE_PROVIDED));
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
 }

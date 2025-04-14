@@ -15,6 +15,7 @@ public class HeaderConstants {
     public static final String HEADER_USER_INFO_PROFILE = "userInfoProfile";
     public static final String HEADER_COUNTRY = "country";
     public static final String HEADER_PLATFORM = "platform";
+    public static final String HEADER_PROFILE = "profile";
 
 
 

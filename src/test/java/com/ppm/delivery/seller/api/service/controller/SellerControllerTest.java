@@ -102,7 +102,7 @@ public class SellerControllerTest {
     }
 
     @Test
-    public void shouldSuccessfullyPatchSellerBusinessHour(){
+    public void shouldSuccessfullyPatchSellerBusinessHours(){
 
         //Arrange
         String sellerCode = UUID.randomUUID().toString();
