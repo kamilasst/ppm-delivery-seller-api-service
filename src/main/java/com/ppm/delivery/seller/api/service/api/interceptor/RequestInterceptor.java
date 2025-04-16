@@ -54,7 +54,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 new Metadata(country, platform, profile)
         );
 
-        requestValidator.validate(header);
+        requestValidator.validateHeader(header);
         return true;
     }
 

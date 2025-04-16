@@ -17,6 +17,7 @@ import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -141,6 +142,7 @@ public class SellerService implements ISellerService {
                             .build();
                     existingBusinessHours.add(newBusinessHour);
                 }
+                seller.getAudit().setUpdatedAt(LocalDateTime.now());
             }
         }
     }
