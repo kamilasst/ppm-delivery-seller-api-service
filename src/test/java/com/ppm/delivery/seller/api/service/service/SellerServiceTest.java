@@ -141,7 +141,7 @@ public class SellerServiceTest {
     }
 
     @Test
-    void shouldSuccessfullyPatchOnlySellerBusinessHoursForAdminOrUser() {
+    void shouldSuccessfullyPatchOnlySellerBusinessHours() {
 
         //Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
@@ -169,8 +169,8 @@ public class SellerServiceTest {
         //Assert
         Assertions.assertNotNull(response);
         Assertions.assertEquals(seller.getCode(), response.code());
-//        Assertions.assertNotNull(response.updatedDate());
-//        Assertions.assertTrue(response.updatedDate().isAfter(seller.getAudit().getCreatedAt()));
+        Assertions.assertNotNull(response.updatedDate());
+        Assertions.assertTrue(response.updatedDate().isAfter(seller.getAudit().getCreatedAt()));
 
         Assertions.assertEquals(2, seller.getBusinessHours().size());
 

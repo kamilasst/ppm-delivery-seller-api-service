@@ -1,9 +1,6 @@
 package com.ppm.delivery.seller.api.service.api.exception;
 
-import com.ppm.delivery.seller.api.service.exception.CountryNotSupportedException;
-import com.ppm.delivery.seller.api.service.exception.BusinessException;
-import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
-import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
+import com.ppm.delivery.seller.api.service.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -30,8 +27,8 @@ public class PPMApiExceptionHandler {
         return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(CountryNotSupportedException.class)
-    public ResponseEntity<Map<String, String>> handleCountryNotSupportedException(CountryNotSupportedException ex) {
+    @ExceptionHandler(HeaderValidationException.class)
+    public ResponseEntity<Map<String, String>> handleHeaderValidationException(HeaderValidationException  ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
