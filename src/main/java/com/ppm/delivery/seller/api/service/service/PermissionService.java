@@ -18,7 +18,7 @@ public class PermissionService implements IPermissionService {
     @Override
     public void validateAdminAccess() {
 
-        if (!Profile.ADMIN.name().equals(contextHolder.getProfile())) {
+        if (!Profile.ADMIN.name().equalsIgnoreCase(contextHolder.getProfile())) {
             throw new BusinessException(MessageErrorConstants.ERROR_OPERATION_NOT_PERMITTED_FOR_THIS_PROFILE);
         }
     }
