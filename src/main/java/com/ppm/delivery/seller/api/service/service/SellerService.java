@@ -1,11 +1,13 @@
 package com.ppm.delivery.seller.api.service.service;
 
+import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
 import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
+import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
@@ -15,6 +17,8 @@ import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,16 +29,13 @@ public class SellerService implements ISellerService {
     private final ContextHolder contextHolder;
     private final ISellerRepository sellerRepository;
     private final IPermissionService permissionService;
-    private final SellerUpdateHelper sellerUpdateHelper;
 
     public SellerService(final ContextHolder contextHolder,
                          final ISellerRepository sellerRepository,
-                         final IPermissionService permissionService,
-                         final SellerUpdateHelper sellerUpdateHelper) {
+                         final IPermissionService permissionService){
         this.contextHolder = contextHolder;
         this.sellerRepository = sellerRepository;
         this.permissionService = permissionService;
-        this.sellerUpdateHelper = sellerUpdateHelper;
     }
 
     @Override
@@ -67,8 +68,8 @@ public class SellerService implements ISellerService {
         validateUpdateStatus(sellerUpdateDTORequest.status());
 
         Seller seller = sellerOptional.get();
-        sellerUpdateHelper.updateStatus(sellerUpdateDTORequest.status(), seller);
-        sellerUpdateHelper.updateBusinessHours(sellerUpdateDTORequest.businessHours(), seller);
+        updateStatus(sellerUpdateDTORequest, seller);
+        updateBusinessHour(sellerUpdateDTORequest, seller);
 
         Seller savedSeller = sellerRepository.save(seller);
 
@@ -77,17 +78,12 @@ public class SellerService implements ISellerService {
                 savedSeller.getStatus(),
                 savedSeller.getAudit().getUpdatedAt()
         );
+
     }
 
     private void validateIdentificationCode(String identificationCode) {
         if (sellerRepository.existsByIdentificationCode(identificationCode)){
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
-        }
-    }
-
-    private void validateExist(Optional<Seller> optionalSeller) {
-        if (optionalSeller.isEmpty()) {
-            throw new EntityNotFoundException(MessageErrorConstants.ERROR_SELLER_NOT_FOUND);
         }
     }
 
@@ -104,9 +100,50 @@ public class SellerService implements ISellerService {
         }
     }
 
+    private void validateExist(Optional<Seller> optionalSeller) {
+        if (optionalSeller.isEmpty()){
+            throw new EntityNotFoundException(MessageErrorConstants.ERROR_SELLER_NOT_FOUND);
+        }
+    }
+
     private void validateUpdateStatus(Status status) {
         if (Objects.nonNull(status)) {
             permissionService.validateAdminAccess();
+        }
+    }
+
+    private static void updateStatus(SellerUpdateDTORequest sellerUpdateDTORequest, Seller seller) {
+        if (Objects.nonNull(sellerUpdateDTORequest.status())) {
+            seller.setStatus(sellerUpdateDTORequest.status());
+        }
+    }
+
+    private static void updateBusinessHour(SellerUpdateDTORequest sellerUpdateDTORequest, Seller seller) {
+
+        if (!CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours())) {
+
+            List<BusinessHour> existingBusinessHours = seller.getBusinessHours();
+
+            for (BusinessHourDTORequest dto : sellerUpdateDTORequest.businessHours()) {
+                Optional<BusinessHour> existing = existingBusinessHours.stream()
+                        .filter(bh -> bh.getDayOfWeek().equals(dto.dayOfWeek()))
+                        .findFirst();
+
+                if (existing.isPresent()) {
+                    BusinessHour businessHour = existing.get();
+                    businessHour.setOpenAt(dto.openAt());
+                    businessHour.setCloseAt(dto.closeAt());
+                } else {
+                    BusinessHour newBusinessHour = BusinessHour.builder()
+                            .dayOfWeek(dto.dayOfWeek())
+                            .openAt(dto.openAt())
+                            .closeAt(dto.closeAt())
+                            .seller(seller)
+                            .build();
+                    existingBusinessHours.add(newBusinessHour);
+                }
+                seller.getAudit().setUpdatedAt(LocalDateTime.now());
+            }
         }
     }
 

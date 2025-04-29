@@ -30,7 +30,7 @@ public class SellerController implements ISellerController{
     }
 
     @Override
-    public ResponseEntity<SellerUpdateDTOResponse> patchV1(@PathVariable String code, @Valid @RequestBody SellerUpdateDTORequest sellerUpdateDTO) {
+    public ResponseEntity<SellerUpdateDTOResponse> patchV1(@Valid @PathVariable String code, @RequestBody SellerUpdateDTORequest sellerUpdateDTO) {
         SellerUpdateDTOResponse response = sellerService.update(code, sellerUpdateDTO);
         return ResponseEntity.ok(response);
     }

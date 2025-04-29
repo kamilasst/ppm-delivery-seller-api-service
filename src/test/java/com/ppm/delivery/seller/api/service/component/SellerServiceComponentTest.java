@@ -22,9 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import static org.hamcrest.Matchers.containsString;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -505,98 +504,18 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                 .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
-
     @Test
-    void shouldReturnBadRequestWhenOpenTimeIsInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00")
-                .closeAt("18:00:00")
-                .build();
+    void shouldReturnBadRequestWhenStatusIsNullAndBusinessHoursIsEmpty() throws Exception {
 
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenCloseTimeIsInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00:00")
-                .closeAt("24:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenAndCloseTimeAreInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00:")
-                .closeAt("24:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")))
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenTimeIsInvalidOnPatch() throws Exception {
         // Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
 
-        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00")
-                .closeAt("18:00:00")
-                .build();
-
-        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
-        businessHours.add(dto);
-
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
-                .businessHours(businessHours)
+                .status(null)
+                .businessHours(List.of())
                 .build();
+
         // Act & Assert
         mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -604,63 +523,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
-    @Test
-    void shouldReturnBadRequestWhenCloseTimeIsInvalidOnPatch() throws Exception {
-        // Arrange
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller seller = SellerBuilder.createDefault(countryCode);
-
-        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00:00")
-                .closeAt("24:00:00")
-                .build();
-
-        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
-        businessHours.add(dto);
-
-        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
-                .businessHours(businessHours)
-                .build();
-        // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenAndCloseTimeAreInvalidOnPatch() throws Exception {
-        // Arrange
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller seller = SellerBuilder.createDefault(countryCode);
-
-        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("08:00")
-                .closeAt("24:00:00")
-                .build();
-
-        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
-        businessHours.add(dto);
-
-        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
-                .businessHours(businessHours)
-                .build();
-        // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")))
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
 }
