@@ -6,7 +6,7 @@ import com.ppm.delivery.seller.api.service.domain.profile.Profile;
 import com.ppm.delivery.seller.api.service.exception.CountryNotSupportedException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.exception.ProfileNotSupportedException;
-import io.micrometer.common.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -29,6 +29,7 @@ public class RequestValidator {
     private void validateCountry(final Header header){
 
         final String country = header.metadata().country();
+
         if (StringUtils.isBlank(country)) {
             throw new CountryNotSupportedException(MessageErrorConstants.ERROR_COUNTRY_REQUIRED_HEADER);
         }

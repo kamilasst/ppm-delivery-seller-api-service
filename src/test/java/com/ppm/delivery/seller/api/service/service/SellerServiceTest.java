@@ -17,6 +17,10 @@ import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +32,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SellerServiceTest {
@@ -42,11 +43,12 @@ public class SellerServiceTest {
     private ISellerRepository sellerRepository;
     @Mock
     private ContextHolder contextHolder;
+    private final SellerUpdateHelper sellerUpdateHelper = new SellerUpdateHelper();
 
     @BeforeEach
     void setUp() {
         PermissionService permissionValidator = new PermissionService(contextHolder);
-        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator);
+        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator, sellerUpdateHelper);
     }
 
     @Test
@@ -85,7 +87,6 @@ public class SellerServiceTest {
         Assertions.assertEquals(savedSeller.getAudit().getCreatedAt(), response.createdDate());
 
         Assertions.assertEquals(savedSeller, seller);
-
     }
 
     @Test
@@ -101,7 +102,6 @@ public class SellerServiceTest {
 
         Assertions.assertThrows(BusinessException.class, () -> sellerService.create(request));
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
-
     }
 
     @Test
@@ -214,6 +214,220 @@ public class SellerServiceTest {
         Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
     }
 
+    @Test
+    void shouldSuccessfullyPatchSellerStatusAndBusinessHoursWhenProfileIsAdmin() {
+        // Arrange
+        Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.of(seller));
+        Mockito.when(contextHolder.getProfile()).thenReturn(Profile.ADMIN.name());
+        Mockito.when(sellerRepository.save(Mockito.any(Seller.class)))
+                .thenAnswer(invocation -> {
+                    Seller saved = invocation.getArgument(0);
+                    saved.getAudit().setUpdatedAt(LocalDateTime.now());
+                    return saved;
+                });
+
+        List<BusinessHourDTORequest> businessHoursList = List.of(
+                BusinessHourDTORequest.builder()
+                        .dayOfWeek("SUNDAY")
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2)
+                        .build(),
+                BusinessHourDTORequest.builder()
+                        .dayOfWeek("MONDAY")
+                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
+                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3)
+                        .build()
+        );
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .status(Status.ACTIVE)
+                .businessHours(businessHoursList)
+                .build();
+
+        // Act
+        SellerUpdateDTOResponse response = sellerService.update(seller.getCode(), request);
+
+        // Assert
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(seller.getCode(), response.code());
+        Assertions.assertEquals(Status.ACTIVE, response.status());
+        Assertions.assertNotNull(response.updatedDate());
+        Assertions.assertTrue(response.updatedDate().isAfter(seller.getAudit().getCreatedAt()));
+        Assertions.assertEquals(2, seller.getBusinessHours().size());
+
+        BusinessHour sunday = seller.getBusinessHours().stream()
+                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
+                .findFirst().orElseThrow();
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, sunday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, sunday.getCloseAt());
+
+        BusinessHour monday = seller.getBusinessHours().stream()
+                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
+                .findFirst().orElseThrow();
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, monday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, monday.getCloseAt());
+
+        Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
+        Mockito.verify(contextHolder, Mockito.times(1)).getProfile();
+        Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenOpenTimeFormatIsInvalidOnCreate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("invalid")
+                .closeAt("18:00:00")
+                .build();
+
+        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
+        request.businessHours().clear();
+        request.businessHours().add(dto);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerDTORequest>> violations = validator.validate(request);
+
+        //Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenCloseTimeFormatIsInvalidOnCreate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("08:00:00")
+                .closeAt("25:00:00")
+                .build();
+
+        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
+        request.businessHours().clear();
+        request.businessHours().add(dto);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerDTORequest>> violations = validator.validate(request);
+
+        //Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenOpenAndCloseTimeFormatsAreInvalidOnCreate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("08:00")
+                .closeAt("25:00:00")
+                .build();
+
+        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
+        request.businessHours().clear();
+        request.businessHours().add(dto);
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerDTORequest>> violations = validator.validate(request);
+
+        // Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenOpenTimeFormatIsInvalidOnUpdate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("invalid")
+                .closeAt("18:00:00")
+                .build();
+
+        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
+        businessHours.add(dto);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .businessHours(businessHours)
+                .build();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerUpdateDTORequest>> violations = validator.validate(request);
+
+        //Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenCloseTimeFormatIsInvalidOnUpdate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("08:00:00")
+                .closeAt("25:00:00")
+                .build();
+
+        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
+        businessHours.add(dto);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .businessHours(businessHours)
+                .build();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerUpdateDTORequest>> violations = validator.validate(request);
+
+        //Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
+
+    @Test
+    void shouldThrowBusinessExceptionWhenOpenAndCloseTimeFormatsAreInvalidOnUpdate() {
+        // Arrange
+        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
+                .dayOfWeek("MONDAY")
+                .openAt("08:00")
+                .closeAt("24:00:00")
+                .build();
+
+        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
+        businessHours.add(dto);
+
+        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
+                .businessHours(businessHours)
+                .build();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        // Act
+        Set<ConstraintViolation<SellerUpdateDTORequest>> violations = validator.validate(request);
+
+        // Assert
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+        Assertions.assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00).")));
+    }
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenSellerIsNotFound() {
@@ -272,7 +486,6 @@ public class SellerServiceTest {
         Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
         Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
-
     }
 
     @Test
@@ -294,7 +507,6 @@ public class SellerServiceTest {
         Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
         Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
-
     }
 
 }
