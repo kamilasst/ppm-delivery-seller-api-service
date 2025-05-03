@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.api.domain.request;
 
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.List;
 public record SellerUpdateDTORequest(
         Status status,
 
-        @Valid
-        List<BusinessHourDTORequest> businessHours
+        @Size(min = 1, message = "At least one business hour must be provided.")
+        List<@Valid BusinessHourDTORequest> businessHours
 
 ) {
 }

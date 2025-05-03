@@ -4,10 +4,7 @@ import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Getter
@@ -59,21 +56,37 @@ public class Seller {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Seller seller = (Seller) o;
+
         return Objects.equals(code, seller.code) &&
                 Objects.equals(countryCode, seller.countryCode) &&
                 Objects.equals(identification, seller.identification) &&
                 Objects.equals(name, seller.name) &&
                 Objects.equals(displayName, seller.displayName) &&
-                Objects.equals(new HashSet<>(contacts), new HashSet<>(seller.contacts)) &&
+                Objects.equals(new HashSet<>(safe(contacts)), new HashSet<>(safe(seller.contacts))) &&
                 Objects.equals(address, seller.address) &&
                 Objects.equals(creatorId, seller.creatorId) &&
                 Objects.equals(status, seller.status) &&
-                Objects.equals(new HashSet<>(businessHours), new HashSet<>(seller.businessHours));
+                Objects.equals(new HashSet<>(safe(businessHours)), new HashSet<>(safe(seller.businessHours)));
+    }
+
+    private <T> Collection<T> safe(Collection<T> collection) {
+        return collection == null ? Collections.emptySet() : collection;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, countryCode, identification, name, displayName, contacts, address, creatorId, status, businessHours);
+        return Objects.hash(
+                code,
+                countryCode,
+                identification,
+                name,
+                displayName,
+                new HashSet<>(safe(contacts)),
+                address,
+                creatorId,
+                status,
+                new HashSet<>(safe(businessHours))
+        );
     }
 
 }

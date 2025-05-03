@@ -10,4 +10,6 @@ public class MessageErrorConstants {
     public static final String ERROR_OPERATION_NOT_PERMITTED_FOR_THIS_PROFILE = "Operation is not permitted for the user's profile";
     public static final String ERROR_PROFILE_REQUIRED_HEADER = "Profile is required in the request header";
     public static final String ERROR_PROFILE_IS_INVALID = "Profile is Invalid";
+    public static final String ERROR_REQUEST_BODY_IS_REQUIRED = "Request body is required";
+    public static final String ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED = "At least one business hour must be provided.";
 }

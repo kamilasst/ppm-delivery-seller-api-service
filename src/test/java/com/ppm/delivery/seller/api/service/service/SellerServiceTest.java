@@ -461,7 +461,7 @@ public class SellerServiceTest {
                 () -> sellerService.update(seller.getCode(), null)
         );
 
-        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
+        Assertions.assertEquals(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED, exception.getMessage());
         Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
 

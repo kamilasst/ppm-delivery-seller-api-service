@@ -1,23 +1,25 @@
 package com.ppm.delivery.seller.api.service.service;
 
+import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
 import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
+import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
+import com.ppm.delivery.seller.api.service.exception.RequiredFieldsException;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class SellerService implements ISellerService {
@@ -42,14 +44,19 @@ public class SellerService implements ISellerService {
 
         final String countryCode = contextHolder.getCountry();
 
+        validateCreateRequest(sellerDTORequest);
         validateIdentificationCode(sellerDTORequest.identification().code());
 
         Seller seller = SellerMapper.INSTANCE.toEntity(sellerDTORequest);
         seller.setCode(UUID.randomUUID().toString());
         seller.setCountryCode(countryCode);
         seller.setStatus(Status.PENDING);
+
         seller.getContacts().forEach(contact -> contact.setSeller(seller));
-        seller.getBusinessHours().forEach(businessHour -> businessHour.setSeller(seller));
+        List<BusinessHour> businessHours = seller.getBusinessHours();
+        if (businessHours != null) {
+            businessHours.forEach(businessHour -> businessHour.setSeller(seller));
+        }
 
         Seller savedSeller = sellerRepository.save(seller);
 
@@ -91,16 +98,69 @@ public class SellerService implements ISellerService {
         }
     }
 
+    private void validateCreateRequest(SellerDTORequest sellerDTORequest) {
+        if (sellerDTORequest == null) {
+            throw new BusinessException(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED);
+        }
+
+        List<BusinessHourDTORequest> businessHours = sellerDTORequest.businessHours();
+
+        if (businessHours != null && businessHours.isEmpty()) {
+            throw new BusinessException(MessageErrorConstants.ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED);
+        }
+
+        if (businessHours != null) {
+            List<String> errorMessage = new ArrayList<>();
+            for (BusinessHourDTORequest dto : businessHours) {
+                if (StringUtils.isBlank(dto.dayOfWeek())) {
+                    errorMessage.add("Dia da Semana obrigatorio");
+                }
+                if (StringUtils.isBlank(dto.openAt())) {
+                    errorMessage.add("Horario de abertura obrigatorio");
+                }
+                if (StringUtils.isBlank(dto.closeAt())) {
+                    errorMessage.add("Horario de fechamento obrigatorio");
+                }
+            }
+            if (!errorMessage.isEmpty()) {
+                throw new RequiredFieldsException(errorMessage);
+            }
+        }
+
+    }
+
+
     private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
 
         if (sellerUpdateDTORequest == null) {
-            throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
+            throw new BusinessException(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED);
         }
         boolean isStatusInvalid = Objects.isNull(sellerUpdateDTORequest.status());
         boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours());
 
         if (isStatusInvalid && isBusinessHoursInvalid) {
             throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
+        }
+
+        List<BusinessHourDTORequest> businessHours = sellerUpdateDTORequest.businessHours();
+
+        if (businessHours != null) {
+            List<String> errorMessages = new ArrayList<>();
+            for (BusinessHourDTORequest dto : businessHours) {
+                if (StringUtils.isBlank(dto.dayOfWeek())) {
+                    errorMessages.add("Dia da semana obrigatório.");
+                }
+                if (StringUtils.isBlank(dto.openAt())) {
+                    errorMessages.add("Horário de abertura obrigatório.");
+                }
+                if (StringUtils.isBlank(dto.closeAt())) {
+                    errorMessages.add("Horário de fechamento obrigatório.");
+                }
+            }
+
+            if (!errorMessages.isEmpty()) {
+                throw new RequiredFieldsException(errorMessages);
+            }
         }
     }
 

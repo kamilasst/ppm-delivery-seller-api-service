@@ -51,7 +51,25 @@ public class PPMApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
+
+        if (ex.getMessage() != null && ex.getMessage().contains("Required request body is missing")) {
+            errorResponse.put("error", "Request body is required");
+        } else {
+            errorResponse.put("error", "Error JSON Inválido - " + ex.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+
+
+    @ExceptionHandler(RequiredFieldsException.class)
+    public ResponseEntity<Map<String, String>> handleRequiredFieldsException(RequiredFieldsException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        for (String erro: ex.getMessages()) {
+            errorResponse.put(erro, erro);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
 }
