@@ -480,7 +480,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
+                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED));
     }
 
     @Test
