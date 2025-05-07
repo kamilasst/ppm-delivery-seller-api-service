@@ -1,8 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Objects;
@@ -18,7 +16,7 @@ public class Contact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "type", nullable = false, length = 50)
     private String type;

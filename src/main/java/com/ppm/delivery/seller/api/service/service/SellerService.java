@@ -113,13 +113,13 @@ public class SellerService implements ISellerService {
             List<String> errorMessage = new ArrayList<>();
             for (BusinessHourDTORequest dto : businessHours) {
                 if (StringUtils.isBlank(dto.dayOfWeek())) {
-                    errorMessage.add("Dia da Semana obrigatorio");
+                    errorMessage.add(MessageErrorConstants.ERROR_DAY_OF_WEEK_IS_MANDATORY);
                 }
                 if (StringUtils.isBlank(dto.openAt())) {
-                    errorMessage.add("Horario de abertura obrigatorio");
+                    errorMessage.add(MessageErrorConstants.ERROR_OPENING_TIME_IS_MANDATORY);
                 }
                 if (StringUtils.isBlank(dto.closeAt())) {
-                    errorMessage.add("Horario de fechamento obrigatorio");
+                    errorMessage.add(MessageErrorConstants.ERROR_CLOSING_TIME_IS_MANDATORY);
                 }
             }
             if (!errorMessage.isEmpty()) {
@@ -148,13 +148,13 @@ public class SellerService implements ISellerService {
             List<String> errorMessages = new ArrayList<>();
             for (BusinessHourDTORequest dto : businessHours) {
                 if (StringUtils.isBlank(dto.dayOfWeek())) {
-                    errorMessages.add("Dia da semana obrigatório.");
+                    errorMessages.add(MessageErrorConstants.ERROR_DAY_OF_WEEK_IS_MANDATORY);
                 }
                 if (StringUtils.isBlank(dto.openAt())) {
-                    errorMessages.add("Horário de abertura obrigatório.");
+                    errorMessages.add(MessageErrorConstants.ERROR_OPENING_TIME_IS_MANDATORY);
                 }
                 if (StringUtils.isBlank(dto.closeAt())) {
-                    errorMessages.add("Horário de fechamento obrigatório.");
+                    errorMessages.add(MessageErrorConstants.ERROR_CLOSING_TIME_IS_MANDATORY);
                 }
             }
 
