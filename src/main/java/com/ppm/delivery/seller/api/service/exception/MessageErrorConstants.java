@@ -12,4 +12,8 @@ public class MessageErrorConstants {
     public static final String ERROR_PROFILE_IS_INVALID = "Profile is Invalid";
     public static final String ERROR_REQUEST_BODY_IS_REQUIRED = "Request body is required";
     public static final String ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED = "At least one business hour must be provided.";
+    public static final String ERROR_DAY_OF_WEEK_IS_MANDATORY = "Day of the week is mandatory";
+    public static final String ERROR_OPENING_TIME_IS_MANDATORY = "Opening time is mandatory";
+    public static final String ERROR_CLOSING_TIME_IS_MANDATORY = "Closing time is mandatory";
+
 }
