@@ -12,7 +12,7 @@ import java.util.List;
 public record SellerUpdateDTORequest(
         Status status,
 
-        @Size(min = 1, message = MessageErrorConstants.ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED)
+        @Size(min = 1, message = "At least one business hour must be provided.")
         List<@Valid BusinessHourDTORequest> businessHours
 
 ) {

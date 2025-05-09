@@ -102,4 +102,96 @@ public class SellerBuilder {
                 .build();
     }
 
+    public static Seller createAllowingNullBusinessHours(String countryCode, SellerDTORequest request) {
+        List<BusinessHour> businessHours = request.businessHours() != null
+                ? request.businessHours().stream()
+                .map(businessHour -> BusinessHour.builder()
+                        .dayOfWeek(businessHour.dayOfWeek())
+                        .openAt(businessHour.openAt())
+                        .closeAt(businessHour.closeAt())
+                        .build())
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        Seller seller = Seller.builder()
+                .code(UUID.randomUUID().toString())
+                .countryCode(countryCode)
+                .identification(Identification.builder()
+                        .type(request.identification().type())
+                        .code(request.identification().code())
+                        .build())
+                .name(request.name())
+                .displayName(request.displayName())
+                .contacts(request.contacts().stream()
+                        .map(contact -> Contact.builder()
+                                .type(contact.type())
+                                .value(contact.value())
+                                .build())
+                        .collect(Collectors.toList()))
+                .address(Address.builder()
+                        .location(Location.builder()
+                                .geoCoordinates(GeoCoordinates.builder()
+                                        .latitude(request.address().location().geoCoordinates().latitude())
+                                        .longitude(request.address().location().geoCoordinates().longitude())
+                                        .build())
+                                .city(request.address().location().city())
+                                .country(request.address().location().country())
+                                .state(request.address().location().state())
+                                .number(request.address().location().number())
+                                .zipCode(request.address().location().zipCode())
+                                .streetAddress(request.address().location().streetAddress())
+                                .build())
+                        .build())
+                .creatorId(request.creatorId())
+                .status(Status.PENDING)
+                .businessHours(businessHours)
+                .audit(Audit.builder().createdAt(LocalDateTime.now()).build())
+                .build();
+
+        seller.getContacts().forEach(contact -> contact.setSeller(seller));
+        seller.getBusinessHours().forEach(bh -> bh.setSeller(seller));
+
+        return seller;
+    }
+
+    public static Seller createWithoutBusinessHours(String countryCode, SellerDTORequest request) {
+        Seller seller = Seller.builder()
+                .code(UUID.randomUUID().toString())
+                .countryCode(countryCode)
+                .identification(Identification.builder()
+                        .type(request.identification().type())
+                        .code(request.identification().code())
+                        .build())
+                .name(request.name())
+                .displayName(request.displayName())
+                .contacts(request.contacts().stream()
+                        .map(contact -> Contact.builder()
+                                .type(contact.type())
+                                .value(contact.value())
+                                .build())
+                        .collect(Collectors.toList()))
+                .address(Address.builder()
+                        .location(Location.builder()
+                                .geoCoordinates(GeoCoordinates.builder()
+                                        .latitude(request.address().location().geoCoordinates().latitude())
+                                        .longitude(request.address().location().geoCoordinates().longitude())
+                                        .build())
+                                .city(request.address().location().city())
+                                .country(request.address().location().country())
+                                .state(request.address().location().state())
+                                .number(request.address().location().number())
+                                .zipCode(request.address().location().zipCode())
+                                .streetAddress(request.address().location().streetAddress())
+                                .build())
+                        .build())
+                .creatorId(request.creatorId())
+                .status(Status.PENDING)
+                .audit(Audit.builder().createdAt(LocalDateTime.now()).build())
+                .build();
+
+        seller.getContacts().forEach(contact -> contact.setSeller(seller));
+
+        return seller;
+    }
+
 }
