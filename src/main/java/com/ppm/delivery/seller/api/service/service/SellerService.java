@@ -98,6 +98,7 @@ public class SellerService implements ISellerService {
         }
     }
 
+
     private void validateCreateRequest(SellerDTORequest sellerDTORequest) {
         if (sellerDTORequest == null) {
             throw new BusinessException(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED);
@@ -112,7 +113,6 @@ public class SellerService implements ISellerService {
         validateBusinessHoursAttributes(businessHours);
 
     }
-
 
     private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
 
@@ -132,19 +132,13 @@ public class SellerService implements ISellerService {
 
     }
 
-    private void validateBusinessHoursAttributes (List<BusinessHourDTORequest> businessHours){
+    private void validateBusinessHoursAttributes(List<BusinessHourDTORequest> businessHours) {
 
         if (businessHours != null) {
             List<String> errorMessages = new ArrayList<>();
             for (BusinessHourDTORequest dto : businessHours) {
-                if (StringUtils.isBlank(dto.dayOfWeek())) {
+                if (StringUtils.isBlank(dto.getDayOfWeek())) {
                     errorMessages.add(MessageErrorConstants.ERROR_DAY_OF_WEEK_IS_MANDATORY);
-                }
-                if (StringUtils.isBlank(dto.openAt())) {
-                    errorMessages.add(MessageErrorConstants.ERROR_OPENING_TIME_IS_MANDATORY);
-                }
-                if (StringUtils.isBlank(dto.closeAt())) {
-                    errorMessages.add(MessageErrorConstants.ERROR_CLOSING_TIME_IS_MANDATORY);
                 }
             }
 

@@ -1,26 +1,32 @@
 package com.ppm.delivery.seller.api.service.api.domain.request;
 
+import com.ppm.delivery.seller.api.service.api.validation.businessHour.ValidBusinessHourTimeRange;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Builder
-public record BusinessHourDTORequest(
+@ValidBusinessHourTimeRange
+public class BusinessHourDTORequest {
 
         @NotNull(message = "Day of week must be provided.")
-        String dayOfWeek,
+        String dayOfWeek;
+
         @Pattern(
                 regexp = "^([01]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$",
                 message = "Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)."
         )
         @NotNull(message = "Open time must be provided.")
-        String openAt,
+        String openAt;
+
         @Pattern(
                 regexp = "^([01]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$",
                 message = "Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)."
         )
         @NotNull(message = "Close time must be provided.")
-        String closeAt
-
-) {
+        String closeAt;
 }
