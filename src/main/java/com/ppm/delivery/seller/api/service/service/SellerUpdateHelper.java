@@ -30,18 +30,18 @@ public class SellerUpdateHelper {
 
         for (BusinessHourDTORequest dto : businessHoursDTOs) {
             Optional<BusinessHour> existing = existingBusinessHours.stream()
-                    .filter(bh -> bh.getDayOfWeek().equals(dto.dayOfWeek()))
+                    .filter(bh -> bh.getDayOfWeek().equals(dto.getDayOfWeek()))
                     .findFirst();
 
             if (existing.isPresent()) {
                 BusinessHour businessHour = existing.get();
-                businessHour.setOpenAt(dto.openAt());
-                businessHour.setCloseAt(dto.closeAt());
+                businessHour.setOpenAt(dto.getOpenAt());
+                businessHour.setCloseAt(dto.getCloseAt());
             } else {
                 BusinessHour newBusinessHour = BusinessHour.builder()
-                        .dayOfWeek(dto.dayOfWeek())
-                        .openAt(dto.openAt())
-                        .closeAt(dto.closeAt())
+                        .dayOfWeek(dto.getDayOfWeek())
+                        .openAt(dto.getOpenAt())
+                        .closeAt(dto.getCloseAt())
                         .seller(seller)
                         .build();
                 existingBusinessHours.add(newBusinessHour);
