@@ -93,7 +93,7 @@ public class SellerBuilder {
                 .status(Status.PENDING)
                 .businessHours(request.businessHours().stream()
                         .map(businessHour -> BusinessHour.builder()
-                                .dayOfWeek(businessHour.getDayOfWeek())
+                                .dayOfWeek(businessHour.getDayOfWeek().toString())
                                 .openAt(businessHour.getOpenAt())
                                 .closeAt(businessHour.getCloseAt())
                                 .build())
@@ -106,7 +106,7 @@ public class SellerBuilder {
         List<BusinessHour> businessHours = request.businessHours() != null
                 ? request.businessHours().stream()
                 .map(businessHour -> BusinessHour.builder()
-                        .dayOfWeek(businessHour.getDayOfWeek())
+                        .dayOfWeek(businessHour.getDayOfWeek().toString())
                         .openAt(businessHour.getOpenAt())
                         .closeAt(businessHour.getCloseAt())
                         .build())

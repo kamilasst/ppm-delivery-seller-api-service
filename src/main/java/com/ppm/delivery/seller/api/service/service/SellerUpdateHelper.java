@@ -39,7 +39,7 @@ public class SellerUpdateHelper {
                 businessHour.setCloseAt(dto.getCloseAt());
             } else {
                 BusinessHour newBusinessHour = BusinessHour.builder()
-                        .dayOfWeek(dto.getDayOfWeek())
+                        .dayOfWeek(dto.getDayOfWeek().toString())
                         .openAt(dto.getOpenAt())
                         .closeAt(dto.getCloseAt())
                         .seller(seller)

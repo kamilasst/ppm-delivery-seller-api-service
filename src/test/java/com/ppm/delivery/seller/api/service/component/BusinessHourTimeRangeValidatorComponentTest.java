@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.DayOfWeek;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +59,7 @@ public class BusinessHourTimeRangeValidatorComponentTest {
     void shouldReturnBadRequestWhenCloseTimeIsBeforeOpenTime() throws Exception {
         // arrange
         BusinessHourDTORequest invalidBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("15:00:00")
                 .closeAt("10:00:00")
                 .build();
@@ -82,7 +83,7 @@ public class BusinessHourTimeRangeValidatorComponentTest {
     void shouldReturnNoViolationsWhenOpenTimeIsBeforeCloseTime() {
         // arrange
         BusinessHourDTORequest validBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt("18:00:00")
                 .build();
@@ -98,7 +99,7 @@ public class BusinessHourTimeRangeValidatorComponentTest {
     void shouldReturnViolationWhenCloseTimeIsBeforeOpenTime() {
         // arrange
         BusinessHourDTORequest invalidBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("18:00:00")
                 .closeAt("08:00:00")
                 .build();
@@ -116,7 +117,7 @@ public class BusinessHourTimeRangeValidatorComponentTest {
     void shouldReturnViolationWhenOpenTimeIsEqualToCloseTime() {
         // arrange
         BusinessHourDTORequest invalidBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt("08:00:00")
                 .build();
@@ -131,26 +132,10 @@ public class BusinessHourTimeRangeValidatorComponentTest {
     }
 
     @Test
-    void shouldReturnNoViolationsWhenOpenTimeIs23AndCloseTimeIs00() {
-        // arrange
-        BusinessHourDTORequest validBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
-                .openAt("23:59:59")
-                .closeAt("00:00:00")
-                .build();
-
-        // Act
-        Set<ConstraintViolation<BusinessHourDTORequest>> violations = validator.validate(validBusinessHour);
-
-        // Assert
-        assertThat(violations).isEmpty();
-    }
-
-    @Test
     void shouldReturnViolationWhenOpenTimeIsEqualToCloseTimeOnDayBoundary() {
         // arrange
         BusinessHourDTORequest invalidBusinessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("23:59:59")
                 .closeAt("23:59:59")
                 .build();

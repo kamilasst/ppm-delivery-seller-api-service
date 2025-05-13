@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-class SellerServiceComponentTest extends AbstractComponentTest{
+class SellerServiceComponentTest extends AbstractComponentTest {
 
     @Test
     @DisplayName("Should successfully POST With Profile is User")
@@ -130,7 +131,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         //Assert
         SellerUpdateDTOResponse response = objectMapper.readValue(
                 resultActions.andReturn().getResponse().getContentAsString(),
-                new TypeReference<>() {});
+                new TypeReference<>() {
+                });
 
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
@@ -214,16 +216,17 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        seller.getBusinessHours().clear();
 
         sellerRepository.saveAndFlush(seller);
 
-        List<BusinessHourDTORequest> businessHoursList  = List.of(
+        List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -244,7 +247,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         // Assert
         SellerUpdateDTOResponse response = objectMapper.readValue(
                 resultActions.andReturn().getResponse().getContentAsString(),
-                new TypeReference<>() {});
+                new TypeReference<>() {
+                });
 
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
@@ -253,13 +257,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         assertEquals(seller.getStatus(), updatedSeller.get().getStatus());
 
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
+                .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
+                .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
@@ -271,16 +275,17 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        seller.getBusinessHours().clear();
 
         sellerRepository.saveAndFlush(seller);
 
-        List<BusinessHourDTORequest> businessHoursList  = List.of(
+        List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -301,7 +306,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         // Assert
         SellerUpdateDTOResponse response = objectMapper.readValue(
                 resultActions.andReturn().getResponse().getContentAsString(),
-                new TypeReference<>() {});
+                new TypeReference<>() {
+                });
 
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
@@ -310,13 +316,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         assertEquals(seller.getStatus(), updatedSeller.get().getStatus());
 
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
+                .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
+                .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
@@ -328,16 +334,17 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         //Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        seller.getBusinessHours().clear();
 
         sellerRepository.saveAndFlush(seller);
 
-        List<BusinessHourDTORequest> businessHoursList  = List.of(
+        List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -359,7 +366,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         // Assert
         SellerUpdateDTOResponse response = objectMapper.readValue(
                 resultActions.andReturn().getResponse().getContentAsString(),
-                new TypeReference<>() {});
+                new TypeReference<>() {
+                });
 
         Optional<Seller> updatedSeller = sellerRepository.findByCode(seller.getCode());
         assertTrue(updatedSeller.isPresent());
@@ -368,13 +376,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         assertEquals(request.status(), updatedSeller.get().getStatus());
 
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("SUNDAY"))
+                .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
-                .filter(bh -> bh.getDayOfWeek().equals("MONDAY"))
+                .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
         assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
         assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
@@ -389,13 +397,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
 
         sellerRepository.saveAndFlush(seller);
 
-        List<BusinessHourDTORequest> businessHoursList  = List.of(
+        List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -422,13 +430,13 @@ class SellerServiceComponentTest extends AbstractComponentTest{
 
         sellerRepository.saveAndFlush(seller);
 
-        List<BusinessHourDTORequest> businessHoursList  = List.of(
+        List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -521,7 +529,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                 .andExpect(status().isCreated());
 
         SellerDTOResponse response = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
 
         // assert
         Optional<Seller> savedSeller = sellerRepository.findAll().stream().findFirst();
@@ -549,7 +558,8 @@ class SellerServiceComponentTest extends AbstractComponentTest{
                 .andExpect(status().isCreated());
 
         SellerDTOResponse response = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
 
         // assert
         Optional<Seller> savedSeller = sellerRepository.findAll().stream().findFirst();
@@ -616,26 +626,51 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     }
 
     @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsEmptyOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("")
-                .openAt("08:00:00")
-                .closeAt("18:00:00")
-                .build();
+    void shouldReturnBadRequestWhenDayOfWeekIsInvalidOnPost() throws Exception {
 
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
+        String invalidRequest = """
+                    {
+                        "businessHours": [
+                            {
+                                "dayOfWeek": "abcde",
+                                "openAt": "08:00:00",
+                                "closeAt": "18:00:00"
+                            }
+                        ]
+                    }
+                """;
 
-        // Act & Assert
         mockMvc.perform(post("/api/seller/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(invalidRequest))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of the week is mandatory")));
+                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot deserialize value of type `java.time.DayOfWeek` from String")));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenDayOfWeekIsBlankOnPost() throws Exception {
+
+        String requestWithBlankDayOfWeek = """
+                    {
+                        "businessHours": [
+                            {
+                                "dayOfWeek": " ",
+                                "openAt": "08:00:00",
+                                "closeAt": "18:00:00"
+                            }
+                        ]
+                    }
+                """;
+
+        mockMvc.perform(post("/api/seller/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
+                        .content(requestWithBlankDayOfWeek))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot coerce empty String (\\\"\\\") to `java.time.DayOfWeek`")));
     }
 
     @Test
@@ -664,7 +699,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenTimeIsInvalidOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00")
                 .closeAt("18:00:00")
                 .build();
@@ -688,7 +723,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenTimeIsNullOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt(null)
                 .closeAt("18:00:00")
                 .build();
@@ -712,7 +747,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenTimeIsNotProvidesOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .closeAt("18:00:00")
                 .build();
 
@@ -735,7 +770,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenCloseTimeIsInvalidOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt("24:00:00")
                 .build();
@@ -759,7 +794,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenCloseTimeIsNullOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt(null)
                 .build();
@@ -783,7 +818,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenCloseTimeIsNotProvidedOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .build();
 
@@ -806,7 +841,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenAndCloseTimeAreInvalidOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00")
                 .closeAt("24:00:00")
                 .build();
@@ -831,7 +866,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenAndCloseTimeAreNullsOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt(null)
                 .closeAt(null)
                 .build();
@@ -856,7 +891,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     void shouldReturnBadRequestWhenOpenAndCloseTimeAreNotProvidedOnPost() throws Exception {
         // Arrange
         BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .build();
 
         SellerDTORequest request = SellerDTORequestBuilder.createDefault();
@@ -945,10 +980,10 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         String invalidJson = """
-        {
-            "businessHours":
-        }
-        """;
+                {
+                    "businessHours":
+                }
+                """;
 
         // Act & Assert
         mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
@@ -989,34 +1024,6 @@ class SellerServiceComponentTest extends AbstractComponentTest{
     }
 
     @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsEmptyOnPatch() throws Exception {
-        // Arrange
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller seller = SellerBuilder.createDefault(countryCode);
-
-        BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("")
-                .openAt("08:00:00")
-                .closeAt("18:00:00")
-                .build();
-
-        List<BusinessHourDTORequest> businessHours = new ArrayList<>();
-        businessHours.add(dto);
-
-        SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
-                .businessHours(businessHours)
-                .build();
-        // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of the week is mandatory")));
-    }
-
-    @Test
     void shouldReturnBadRequestWhenDayOfWeekIsNotProvidedOnPatch() throws Exception {
         // Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
@@ -1050,7 +1057,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00")
                 .closeAt("18:00:00")
                 .build();
@@ -1078,7 +1085,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt(null)
                 .closeAt("18:00:00")
                 .build();
@@ -1106,7 +1113,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .closeAt("18:00:00")
                 .build();
 
@@ -1133,7 +1140,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt("24:00:00")
                 .build();
@@ -1161,7 +1168,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .closeAt(null)
                 .build();
@@ -1189,7 +1196,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00:00")
                 .build();
 
@@ -1216,7 +1223,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt("08:00")
                 .closeAt("24:00:00")
                 .build();
@@ -1245,7 +1252,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .openAt(null)
                 .closeAt(null)
                 .build();
@@ -1274,7 +1281,7 @@ class SellerServiceComponentTest extends AbstractComponentTest{
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
-                .dayOfWeek("MONDAY")
+                .dayOfWeek(DayOfWeek.MONDAY)
                 .build();
 
         List<BusinessHourDTORequest> businessHours = new ArrayList<>();
