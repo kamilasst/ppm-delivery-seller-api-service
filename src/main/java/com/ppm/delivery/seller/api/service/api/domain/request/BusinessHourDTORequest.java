@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
+
 @Getter
 @Setter
 @Builder
@@ -14,7 +16,7 @@ import lombok.Setter;
 public class BusinessHourDTORequest {
 
         @NotNull(message = "Day of week must be provided.")
-        String dayOfWeek;
+        DayOfWeek dayOfWeek;
 
         @Pattern(
                 regexp = "^([01]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$",

@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -109,11 +110,11 @@ public class SellerControllerTest {
 
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 
@@ -143,11 +144,11 @@ public class SellerControllerTest {
 
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
                 BusinessHourDTORequest.builder()
-                        .dayOfWeek("MONDAY")
+                        .dayOfWeek(DayOfWeek.MONDAY)
                         .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
                         .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
 

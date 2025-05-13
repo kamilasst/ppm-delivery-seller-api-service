@@ -61,15 +61,4 @@ public class PPMApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-
-
-    @ExceptionHandler(RequiredFieldsException.class)
-    public ResponseEntity<Map<String, String>> handleRequiredFieldsException(RequiredFieldsException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        for (String erro: ex.getMessages()) {
-            errorResponse.put(erro, erro);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
 }

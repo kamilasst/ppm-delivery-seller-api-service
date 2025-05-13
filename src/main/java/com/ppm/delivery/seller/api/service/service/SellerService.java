@@ -110,8 +110,6 @@ public class SellerService implements ISellerService {
             throw new BusinessException(MessageErrorConstants.ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED);
         }
 
-        validateBusinessHoursAttributes(businessHours);
-
     }
 
     private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
@@ -126,26 +124,6 @@ public class SellerService implements ISellerService {
             throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
         }
 
-        List<BusinessHourDTORequest> businessHours = sellerUpdateDTORequest.businessHours();
-
-        validateBusinessHoursAttributes(businessHours);
-
-    }
-
-    private void validateBusinessHoursAttributes(List<BusinessHourDTORequest> businessHours) {
-
-        if (businessHours != null) {
-            List<String> errorMessages = new ArrayList<>();
-            for (BusinessHourDTORequest dto : businessHours) {
-                if (StringUtils.isBlank(dto.getDayOfWeek())) {
-                    errorMessages.add(MessageErrorConstants.ERROR_DAY_OF_WEEK_IS_MANDATORY);
-                }
-            }
-
-            if (!errorMessages.isEmpty()) {
-                throw new RequiredFieldsException(errorMessages);
-            }
-        }
     }
 
     private void validateUpdateStatus(Status status) {

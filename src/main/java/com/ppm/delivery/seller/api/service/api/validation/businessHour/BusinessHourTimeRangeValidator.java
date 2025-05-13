@@ -19,11 +19,7 @@ public class BusinessHourTimeRangeValidator implements ConstraintValidator<Valid
             LocalTime open = LocalTime.parse(value.getOpenAt());
             LocalTime close = LocalTime.parse(value.getCloseAt());
 
-            if (open.equals(close)) {
-                return false;
-            }
-
-            return !open.equals(close);
+            return open.isBefore(close);
         } catch (DateTimeParseException e) {
             return false;
         }

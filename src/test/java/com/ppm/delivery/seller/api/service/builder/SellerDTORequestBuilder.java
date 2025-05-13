@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.builder;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.*;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,7 @@ public final class SellerDTORequestBuilder {
                         .build())
                 .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
                 .businessHours(new ArrayList<>(Arrays.asList(BusinessHourDTORequest.builder()
-                        .dayOfWeek("SUNDAY")
+                        .dayOfWeek(DayOfWeek.SUNDAY)
                         .openAt("00:00:00")
                         .closeAt("23:59:00")
                         .build())))
@@ -136,41 +137,6 @@ public final class SellerDTORequestBuilder {
                                 .build())
                         .build())
                 .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
-                .build();
-    }
-
-    public static SellerDTORequest createWithEmptyDayOfWeek() {
-        return SellerDTORequest.builder()
-                .identification(IdentificationDTORequest.builder()
-                        .type("CNPJ")
-                        .code("12345678901435")
-                        .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
-                .contacts(List.of(ContactDTORequest.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
-                        .build()))
-                .address(AddressDTORequest.builder()
-                        .location(LocationDTORequest.builder()
-                                .geoCoordinates(GeoCoordinatesDTORequest.builder()
-                                        .latitude("-23.520930238344484")
-                                        .longitude("-46.905673295259476")
-                                        .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
-                                .build())
-                        .build())
-                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
-                .businessHours(List.of(BusinessHourDTORequest.builder()
-                        .dayOfWeek(" ")
-                        .openAt("00:00:00")
-                        .closeAt("23:59:00")
-                        .build()))
                 .build();
     }
 

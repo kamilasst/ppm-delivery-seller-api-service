@@ -24,7 +24,6 @@ public record SellerDTORequest(
         @Size(min = 1, message = "At least one contact is required")
         @Valid
         List<ContactDTORequest> contacts,
-
         @NotNull(message = "Address is required")
         @Valid
         AddressDTORequest address,
