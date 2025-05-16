@@ -1052,6 +1052,63 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .andExpect(content().string(containsString("Day of week must be provided.")));
     }
 
+
+    @Test
+    void shouldReturnBadRequestWhenDayOfWeekIsInvalidOnPatch() throws Exception {
+
+        // Arrange
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.createDefault(countryCode);
+
+        String invalidRequest = """
+                    {
+                        "businessHours": [
+                            {
+                                "dayOfWeek": "abcde",
+                                "openAt": "08:00:00",
+                                "closeAt": "18:00:00"
+                            }
+                        ]
+                    }
+                """;
+
+        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
+                        .content(invalidRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot deserialize value of type `java.time.DayOfWeek` from String")));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenDayOfWeekIsBlankOnPatch() throws Exception {
+
+        // Arrange
+        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
+        Seller seller = SellerBuilder.createDefault(countryCode);
+
+        String requestWithBlankDayOfWeek = """
+                    {
+                        "businessHours": [
+                            {
+                                "dayOfWeek": " ",
+                                "openAt": "08:00:00",
+                                "closeAt": "18:00:00"
+                            }
+                        ]
+                    }
+                """;
+
+        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
+                        .content(requestWithBlankDayOfWeek))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot coerce empty String (\\\"\\\") to `java.time.DayOfWeek`")));
+    }
+
     @Test
     void shouldReturnBadRequestWhenOpenTimeIsInvalidOnPatch() throws Exception {
         // Arrange
