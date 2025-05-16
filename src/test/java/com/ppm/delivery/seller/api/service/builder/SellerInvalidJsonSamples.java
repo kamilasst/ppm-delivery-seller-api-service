@@ -20,10 +20,10 @@ public class SellerInvalidJsonSamples {
                 "address": {
                     "location": {
                         "geoCoordinates": {
-                            "latitude": "-23.520930238344484",
-                            "longitude": "-46.905673295259476"
+                            "latitude": -23.520930238344484,
+                            "longitude": -46.905673295259476
                         },
-                        "city": "-46.905673295259476",
+                        "city": "Barueri",
                         "country": "BR",
                         "state": "São Paulo",
                         "number": "2161",

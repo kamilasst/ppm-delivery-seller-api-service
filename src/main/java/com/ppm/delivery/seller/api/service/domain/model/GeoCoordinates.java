@@ -15,19 +15,19 @@ import java.util.Objects;
 @ToString
 public class GeoCoordinates {
 
-    @Column(name = "latitude", length = 50)
-    private String latitude;
+    @Column(name = "location_latitude", nullable = false)
+    private Double latitude;
 
-    @Column(name = "longitude", length = 50)
-    private String longitude;
+    @Column(name = "location_longitude", nullable = false)
+    private Double longitude;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GeoCoordinates that = (GeoCoordinates) o;
-        return Objects.equals(latitude, that.latitude) &&
-                Objects.equals(longitude, that.longitude);
+        return Double.compare(that.latitude, latitude) == 0 &&
+                Double.compare(that.longitude, longitude) == 0;
     }
 
     @Override
