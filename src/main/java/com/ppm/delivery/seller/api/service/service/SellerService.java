@@ -44,9 +44,12 @@ public class SellerService implements ISellerService {
 
         final String countryCode = contextHolder.getCountry();
 
+        // TODO atg ReviewCode POST: Por favor avalie renomear o metodo validateCreateRequest para validateCreate, dentro dele chamar o validateIdentificationCode
+        // isso ajuda a concentrar todas as validações de criação em um único lugar
         validateCreateRequest(sellerDTORequest);
         validateIdentificationCode(sellerDTORequest.identification().code());
 
+        // TODO atg ReviewCode POST: Por favor avalie criar um método createSeller responsável por criar o seller. linha 53 até 64
         Seller seller = SellerMapper.INSTANCE.toEntity(sellerDTORequest);
         seller.setCode(UUID.randomUUID().toString());
         seller.setCountryCode(countryCode);
@@ -54,6 +57,8 @@ public class SellerService implements ISellerService {
 
         seller.getContacts().forEach(contact -> contact.setSeller(seller));
         List<BusinessHour> businessHours = seller.getBusinessHours();
+
+        // TODO atg ReviewCode POST: Por favor avalie  if (Objects.nonNull(businessHours))
         if (businessHours != null) {
             businessHours.forEach(businessHour -> businessHour.setSeller(seller));
         }
@@ -67,6 +72,10 @@ public class SellerService implements ISellerService {
     @Override
     public SellerUpdateDTOResponse update(String code, SellerUpdateDTORequest sellerUpdateDTORequest) {
 
+        // TODO atg ReviewCode PATCH: Por favor avalie reorganizar esses metodos de valdiacao da seguinte forma
+        // Renomear validateUpdateRequest para validateUpdate e adicionar o validateUpdateStatus dentro dele
+        // para concentrar as validacoes de negócio dentro de um unico metodo
+        // Se ficar na duvida, chama... podemos avaliar se faz sentido o validateExist ir para dentro dele tb
         validateUpdateRequest(sellerUpdateDTORequest);
 
         Optional<Seller> sellerOptional = sellerRepository.findByCode(code);
@@ -74,6 +83,10 @@ public class SellerService implements ISellerService {
         validateUpdateStatus(sellerUpdateDTORequest.status());
 
         Seller seller = sellerOptional.get();
+
+        // TODO atg ReviewCode PATCH: Evite utilizar classe como nomes genericos: 'helper'
+        // TODO atg ReviewCode PATCH: Não achei interessante criar um service a parte(@Component) para fazer essa validacao em outra classe
+        // achei um pouco confuso, minha sugestao é ser um método privado dentro dessa classe mesmo, podemos trocar ideia sobre
         sellerUpdateHelper.updateStatus(sellerUpdateDTORequest.status(), seller);
         sellerUpdateHelper.updateBusinessHours(sellerUpdateDTORequest.businessHours(), seller);
 
@@ -100,26 +113,30 @@ public class SellerService implements ISellerService {
 
 
     private void validateCreateRequest(SellerDTORequest sellerDTORequest) {
+        // TODO atg ReviewCode POST: Por favor avalie criar um método validateRequestNull
         if (sellerDTORequest == null) {
             throw new BusinessException(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED);
         }
 
+        // TODO atg ReviewCode POST: Por favor avalie criar um método validateBusinessHoursEmpty
         List<BusinessHourDTORequest> businessHours = sellerDTORequest.businessHours();
-
         if (businessHours != null && businessHours.isEmpty()) {
             throw new BusinessException(MessageErrorConstants.ERROR_AT_LEAST_ONE_BUSINESS_HOUR_REQUIRED);
         }
-
     }
 
     private void validateUpdateRequest(SellerUpdateDTORequest sellerUpdateDTORequest) {
 
+        // TODO atg ReviewCode PATCH: Por favor avalie criar um método validateRequestNull, como esse método é muito
+        // parecido com o do POST, de uma pesquisada e avalie utilizar "generics" para criar um método generico e
+        // reutilizar o metodo no POST e PATCH
         if (sellerUpdateDTORequest == null) {
             throw new BusinessException(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED);
         }
+
+        // TODO atg ReviewCode PATCH: Por favor avalie criar um método validateUpdateBusinessHours
         boolean isStatusInvalid = Objects.isNull(sellerUpdateDTORequest.status());
         boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(sellerUpdateDTORequest.businessHours());
-
         if (isStatusInvalid && isBusinessHoursInvalid) {
             throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);
         }

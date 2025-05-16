@@ -15,7 +15,7 @@ import com.ppm.delivery.seller.api.service.domain.profile.Profile;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
-import com.ppm.delivery.seller.api.service.exception.RequiredFieldsException;
+import com.ppm.delivery.seller.api.service.exception.RequiredFieldsException; // TODO atg ReviewCode POST: Por favor avalie remover essa importação
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
@@ -384,6 +384,7 @@ public class SellerServiceTest {
                 () -> sellerService.update(seller.getCode(), request)
         );
 
+        // TODO atg ReviewCode POST: Por favor avalie MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED
         // Assert
         Assertions.assertEquals("Status or business hours are required", exception.getMessage());
     }
@@ -402,6 +403,7 @@ public class SellerServiceTest {
                 () -> sellerService.update(seller.getCode(), request)
         );
 
+        // TODO atg ReviewCode POST: Por favor avalie MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED
         // Assert
         Assertions.assertEquals("Status or business hours are required", exception.getMessage());
     }

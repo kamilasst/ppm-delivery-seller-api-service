@@ -39,6 +39,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// TODO atg ReviewCode POST/PATCH: A implementacao dos metodos está muito bom, parabéns.. porém a classe está ficando grande demais
+// para uma melhor organizacao e separacao de responsabilidades, avalie separar os testes de componente em duas classes:
+// SellerServiceComponentPOSTTest e SellerServiceComponentPATCHTest ou seja, separando os metodos de POST e PATCH
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
@@ -53,6 +56,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller sellerByRequest = SellerBuilder.create(countryCode, sellerDTORequest);
 
+        // TODO atg ReviewCode POST: Por favor avalie criar constante para, exemplo: PATH_POST_CREATE = "/api/seller/create"
         // act
         var resultActions = mockMvc
                 .perform(
@@ -120,6 +124,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(Status.ACTIVE).build();
 
+        // TODO atg ReviewCode POST: Por favor avalie criar constante para, exemplo: PATH_PATCH_UPDATE = "/api/seller/patch/{code}"
         //Act
         var resultActions = mockMvc
                 .perform(

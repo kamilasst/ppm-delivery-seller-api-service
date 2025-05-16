@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class SellerBuilder {
 
     public static Seller createDefault(String countryCode){
-
+        // TODO atg ReviewCode: Criar utilizar constants
         Seller seller = Seller.builder()
                 .code(UUID.randomUUID().toString())
                 .countryCode(countryCode)

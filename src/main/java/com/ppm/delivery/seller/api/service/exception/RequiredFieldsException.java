@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.exception;
 
 import java.util.List;
 
+// TODO atg ReviewCode: Verifica se está sendo usado, caso contrário apagar
 public class RequiredFieldsException extends RuntimeException{
 
     private List<String> messages;

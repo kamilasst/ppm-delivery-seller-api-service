@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+// TODO atg ReviewCode: Essa classe deveria está dentro do pacote de testes "api.controller"
 @ExtendWith(MockitoExtension.class)
 public class SellerControllerTest {
 

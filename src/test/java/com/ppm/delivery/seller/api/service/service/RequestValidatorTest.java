@@ -41,6 +41,7 @@ public class RequestValidatorTest {
         assertThrows(CountryNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
+    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenCountryIsNotSupported() {
 
@@ -55,6 +56,7 @@ public class RequestValidatorTest {
         assertThrows(CountryNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
+    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenProfileIsBlank() {
 
@@ -69,6 +71,7 @@ public class RequestValidatorTest {
         assertThrows(ProfileNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
+    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenProfileIsInvalid() {
 
@@ -83,6 +86,7 @@ public class RequestValidatorTest {
         assertThrows(ProfileNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
+    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldNotThrowExceptionWhenHeaderIsValid() {
 

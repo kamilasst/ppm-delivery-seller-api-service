@@ -1,7 +1,10 @@
 package com.ppm.delivery.seller.api.service.utils;
 
+// TODO atg ReviewCode POST: Evite criar pacote "utils" é um nome muito genérico e possibilita que outros devs adicionem
+// classes aqui que não fazem sentido, procure criar pactotes mais específicos, como por exemplo "constants"
 public class ConstantsMocks {
 
+    // TODO atg ReviewCode POST: Remova os countries nao utilizados
     public static final String COUNTRY_CODE_BR = "BR";
     public static final String COUNTRY_CODE_AR = "AR";
     public static final String COUNTRY_CODE_CO = "CO";

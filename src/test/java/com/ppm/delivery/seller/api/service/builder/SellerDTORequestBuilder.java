@@ -8,10 +8,34 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+// TODO atg ReviewCode: Por favor avalie criar constants para os valores
 public final class SellerDTORequestBuilder {
 
     private SellerDTORequestBuilder() {
     }
+
+    // TODO atg ReviewCode: Os metodos estao muito iguals, por favor avalie uma forma de reutilizar o código: exemplo:
+//    private static SellerDTORequest create(String identificationType, String identificationCode, String name, String displayName, String contactType, String contactValue, String countryCode, String state, String city, String streetAddress, String number, String zipCode) {
+//        return SellerDTORequest.builder()
+//                .identification(IdentificationDTORequest.builder()
+//                        .type(identificationType)
+//                        .code(identificationCode)
+//                        .build())
+//                .name(name)
+//                .displayName(displayName)
+//                ...
+//    }
+
+// e dentro dos metodos createDefault, createWithNullBusinessHours e etc vc pode chamar ele passando os parametros necesarios
+//    public static SellerDTORequest createDefault() {
+//        return create(IDENTIFICATION_CODE_CNPJ, IDENTIFICATION_CODE_CNPJ_VALUE,);
+//                NAME, DISPLAY_NAME, CONTACT_TYPE, CONTACT_VALUE,
+//                COUNTRY_CODE, STATE, CITY, STREET_ADDRESS, NUMBER, ZIP_CODE);
+//    }
+//    public static SellerDTORequest createWithNullBusinessHours() {
+//        return create(PASSAR NULO PARA BUSINESS HOURS);
+//    }
+
 
     public static SellerDTORequest createDefault() {
         return SellerDTORequest.builder()
