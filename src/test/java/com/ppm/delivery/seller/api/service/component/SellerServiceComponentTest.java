@@ -3,9 +3,7 @@ package com.ppm.delivery.seller.api.service.component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ppm.delivery.seller.api.service.PpmDeliverySellerApiServiceApplication;
 import com.ppm.delivery.seller.api.service.api.constants.HeaderConstants;
-import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
-import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
-import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.request.*;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.builder.SellerBuilder;
@@ -19,6 +17,9 @@ import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1301,4 +1303,43 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .andExpect(content().string(containsString("Close time must be provided.")));
     }
 
+    @ParameterizedTest
+    @MethodSource("geoCoordinatesProvider")
+    void shouldReturnBadRequestWhenGeoCoordinatesAreOutOfRange(Double latitude, Double longitude, String expectedLatitudeError, String expectedLongitudeError) throws Exception {
+        // Arrange
+        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
+
+        GeoCoordinatesDTORequest geoCoordinates = GeoCoordinatesDTORequest.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
+
+        SellerDTORequest request2 = SellerDTORequestBuilder.createWithCustomGeoCoordinates(request, geoCoordinates);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/seller/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
+                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
+                        .content(objectMapper.writeValueAsString(request2)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString(expectedLatitudeError)))
+                .andExpect(content().string(containsString(expectedLongitudeError)));
+    }
+
+
+    private static Stream<Arguments> geoCoordinatesProvider() {
+        return Stream.of(
+                // Testes para Latitude
+                Arguments.of(-100.0, -46.6333, "Latitude must be >= -90.0", ""),
+                Arguments.of(100.0, -46.6333, "Latitude must be <= 90.0", ""),
+
+                // Testes para Longitude
+                Arguments.of(-23.5505, -200.0, "", "Longitude must be >= -180.0"),
+                Arguments.of(-23.5505, 200.0, "", "Longitude must be <= 180.0"),
+
+                // Testes para ambos
+                Arguments.of(-100.0, 200.0, "Latitude must be >= -90.0", "Longitude must be <= 180.0")
+        );
+    }
 }
