@@ -28,7 +28,7 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Iniciar container PostgreSQL com Docker Compose
-      run: docker-compose up -d postgres
+      run: docker compose up -d postgres
       # Este comando utiliza o arquivo 'docker-compose.yml' na raiz do seu repositorio.
       # O servico 'postgres' definido no seu docker-compose.yml sera iniciado.
 
@@ -39,7 +39,7 @@ jobs:
         # Ele tenta se conectar usando 'pg_isready' dentro do container do postgres.
         # O usuario padrao para a imagem postgres e 'postgres'.
         for i in {1..15}; do
-          if docker exec $(docker-compose ps -q postgres) pg_isready -U postgres -d database-seller -h localhost; then
+          if docker exec $(docker compose ps -q postgres) pg_isready -U postgres -d database-seller -h localhost; then
             echo "PostgreSQL esta pronto."
             exit 0
           fi
