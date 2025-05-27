@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.api.validation.businessHour;
 
+import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -10,8 +11,7 @@ import java.lang.annotation.*;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidBusinessHourTimeRange {
-    // TODO atg ReviewCode POST: Tem alguma forma de vc colocar esse mensagem como constante e reutilizar nos testes unitários ?
-    String message() default "Opening time must be before closing time";
+    String message() default MessageErrorConstants.ERROR_OPENING_TIME_MUST_BE_BEFORE_CLOSING_TIME;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

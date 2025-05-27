@@ -3,23 +3,17 @@ package com.ppm.delivery.seller.api.service.component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ppm.delivery.seller.api.service.PpmDeliverySellerApiServiceApplication;
 import com.ppm.delivery.seller.api.service.api.constants.HeaderConstants;
-import com.ppm.delivery.seller.api.service.api.domain.request.*;
-import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
+import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.builder.SellerBuilder;
-import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
-import com.ppm.delivery.seller.api.service.builder.SellerInvalidJsonSamples;
 import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.domain.profile.Profile;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
-import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
-import org.junit.jupiter.api.DisplayName;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -30,87 +24,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-// TODO atg ReviewCode POST/PATCH: A implementacao dos metodos está muito bom, parabéns.. porém a classe está ficando grande demais
-// para uma melhor organizacao e separacao de responsabilidades, avalie separar os testes de componente em duas classes:
-// SellerServiceComponentPOSTTest e SellerServiceComponentPATCHTest ou seja, separando os metodos de POST e PATCH
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-class SellerServiceComponentTest extends AbstractComponentTest {
-
-    @Test
-    @DisplayName("Should successfully POST With Profile is User")
-    void shouldSuccessfullyPostSellerToDatabaseWithProfileIsUser() throws Exception {
-
-        // arrange
-        SellerDTORequest sellerDTORequest = SellerDTORequestBuilder.createDefault();
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller sellerByRequest = SellerBuilder.create(countryCode, sellerDTORequest);
-
-        // TODO atg ReviewCode POST: Por favor avalie criar constante para, exemplo: PATH_POST_CREATE = "/api/seller/create"
-        // act
-        var resultActions = mockMvc
-                .perform(
-                        post("/api/seller/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                                .header(HeaderConstants.HEADER_PROFILE, Profile.USER.name())
-                                .content(objectMapper.writeValueAsString(sellerDTORequest)))
-                .andExpect(status().isCreated());
-
-        SellerDTOResponse sellerDTOResponse = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-                });
-
-        // assert
-        Optional<Seller> optionalSellerDatabase = sellerRepository.findAll().stream().findFirst();
-
-        assertTrue(optionalSellerDatabase.isPresent());
-
-        sellerByRequest.setCode(sellerDTOResponse.code());
-        assertEquals(sellerByRequest, optionalSellerDatabase.get());
-    }
-
-    @Test
-    @DisplayName("Should successfully POST With Profile is ADMIN")
-    void shouldSuccessfullyPostSellerToDatabaseWithProfileIsAdmin() throws Exception {
-
-        // arrange
-        SellerDTORequest sellerDTORequest = SellerDTORequestBuilder.createDefault();
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller sellerByRequest = SellerBuilder.create(countryCode, sellerDTORequest);
-
-        // act
-        var resultActions = mockMvc
-                .perform(
-                        post("/api/seller/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                                .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                                .content(objectMapper.writeValueAsString(sellerDTORequest)))
-                .andExpect(status().isCreated());
-
-        SellerDTOResponse sellerDTOResponse = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-                });
-
-        // assert
-        Optional<Seller> optionalSellerDatabase = sellerRepository.findAll().stream().findFirst();
-
-        assertTrue(optionalSellerDatabase.isPresent());
-
-        sellerByRequest.setCode(sellerDTOResponse.code());
-        assertEquals(sellerByRequest, optionalSellerDatabase.get());
-    }
+public class SellerServiceComponentPATCHTest extends AbstractComponentTest{
 
     @Test
     void shouldSuccessfullyPatchSellerOnlyStatusWhenProfileIsAdmin() throws Exception {
@@ -124,11 +49,10 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(Status.ACTIVE).build();
 
-        // TODO atg ReviewCode POST: Por favor avalie criar constante para, exemplo: PATH_PATCH_UPDATE = "/api/seller/patch/{code}"
         //Act
         var resultActions = mockMvc
                 .perform(
-                        patch("/api/seller/patch/{code}", seller.getCode())
+                        patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                                 .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -162,13 +86,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.USER.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_OPERATION_NOT_PERMITTED_FOR_THIS_PROFILE));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_OPERATION_NOT_PERMITTED_FOR_THIS_PROFILE));
     }
 
     @Test
@@ -185,13 +109,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, " ")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_PROFILE_REQUIRED_HEADER));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_PROFILE_REQUIRED_HEADER));
     }
 
     @Test
@@ -208,13 +132,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, "INVALID_PROFILE")
+                        .header(HeaderConstants.HEADER_PROFILE, ConstantsMocks.JSON_INVALID_PROFILE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_PROFILE_IS_INVALID));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_PROFILE_IS_INVALID));
     }
 
     @Test
@@ -230,12 +154,12 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -244,7 +168,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Act
         var resultActions = mockMvc
                 .perform(
-                        patch("/api/seller/patch/{code}", seller.getCode())
+                        patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                                 .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -266,14 +190,14 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_08h30m00, updatedSunday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_09h00m00, updatedMonday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedMonday.getCloseAt());
     }
 
     @Test
@@ -289,12 +213,12 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -303,7 +227,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Act
         var resultActions = mockMvc
                 .perform(
-                        patch("/api/seller/patch/{code}", seller.getCode())
+                        patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                                 .header(HeaderConstants.HEADER_PROFILE, Profile.USER.name())
@@ -325,14 +249,14 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_08h30m00, updatedSunday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_09h00m00, updatedMonday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedMonday.getCloseAt());
     }
 
     @Test
@@ -348,12 +272,12 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -363,7 +287,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Act
         var resultActions = mockMvc
                 .perform(
-                        patch("/api/seller/patch/{code}", seller.getCode())
+                        patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                                 .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -385,14 +309,14 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         BusinessHour updatedSunday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedSunday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_08h30m00, updatedSunday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedSunday.getCloseAt());
 
         BusinessHour updatedMonday = updatedSeller.get().getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, updatedMonday.getOpenAt());
-        assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, updatedMonday.getCloseAt());
+        assertEquals(ConstantsMocks.TIME_09h00m00, updatedMonday.getOpenAt());
+        assertEquals(ConstantsMocks.TIME_18h00m00, updatedMonday.getCloseAt());
     }
 
     @Test
@@ -407,25 +331,25 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, " ")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_PROFILE_REQUIRED_HEADER));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_PROFILE_REQUIRED_HEADER));
     }
 
     @Test
@@ -440,25 +364,25 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, "INVALID_PROFILE")
+                        .header(HeaderConstants.HEADER_PROFILE, ConstantsMocks.JSON_INVALID_PROFILE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_PROFILE_IS_INVALID));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_PROFILE_IS_INVALID));
     }
 
     @Test
@@ -467,6 +391,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        sellerRepository.save(seller);
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(null)
@@ -474,13 +399,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
     @Test
@@ -492,13 +417,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .status(Status.ACTIVE).build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", nonExistentCode)
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, nonExistentCode)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_SELLER_NOT_FOUND));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_SELLER_NOT_FOUND));
     }
 
     @Test
@@ -509,413 +434,15 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         Seller seller = SellerBuilder.createDefault(countryCode);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED));
     }
 
-    @Test
-    void shouldSuccessfullyPostWhenBusinessHoursIsNullOnPost() throws Exception {
-
-        // arrange
-        SellerDTORequest request = SellerDTORequestBuilder.createWithNullBusinessHours();
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller expectedSeller = SellerBuilder.createAllowingNullBusinessHours(countryCode, request);
-
-        // act
-        var resultActions = mockMvc
-                .perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, countryCode)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-
-        SellerDTOResponse response = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-                });
-
-        // assert
-        Optional<Seller> savedSeller = sellerRepository.findAll().stream().findFirst();
-        assertTrue(savedSeller.isPresent());
-
-        expectedSeller.setCode(response.code());
-        assertEquals(expectedSeller, savedSeller.get());
-    }
-
-    @Test
-    void shouldSuccessfullyPostWhenBusinessHoursIsNotProvidedOnPost() throws Exception {
-
-        // arrange
-        SellerDTORequest request = SellerDTORequestBuilder.createWithoutBusinessHours();
-        String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
-        Seller expectedSeller = SellerBuilder.createWithoutBusinessHours(countryCode, request);
-
-        // act
-        var resultActions = mockMvc
-                .perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, countryCode)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-
-        SellerDTOResponse response = objectMapper.readValue(
-                resultActions.andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-                });
-
-        // assert
-        Optional<Seller> savedSeller = sellerRepository.findAll().stream().findFirst();
-        assertTrue(savedSeller.isPresent());
-
-        expectedSeller.setCode(response.code());
-        assertEquals(expectedSeller, savedSeller.get());
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenBusinessHoursIsEmptyOnPost() throws Exception {
-
-        // Arrange
-        SellerDTORequest request = SellerDTORequestBuilder.createWithEmptyBusinessHours();
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("At least one business hour must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenBusinessHoursFieldHasInvalidJsonOnPost() throws Exception {
-
-        // Arrange
-        String malformedJson = SellerInvalidJsonSamples.businessHoursMissingValue();
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(malformedJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Error JSON Inválido - JSON parse error: Unexpected character ('}' (code 125)): expected a value")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsNullOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(null)
-                .openAt("08:00:00")
-                .closeAt("18:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of week must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsInvalidOnPost() throws Exception {
-
-        String invalidRequest = """
-                    {
-                        "businessHours": [
-                            {
-                                "dayOfWeek": "abcde",
-                                "openAt": "08:00:00",
-                                "closeAt": "18:00:00"
-                            }
-                        ]
-                    }
-                """;
-
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(invalidRequest))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot deserialize value of type `java.time.DayOfWeek` from String")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsBlankOnPost() throws Exception {
-
-        String requestWithBlankDayOfWeek = """
-                    {
-                        "businessHours": [
-                            {
-                                "dayOfWeek": " ",
-                                "openAt": "08:00:00",
-                                "closeAt": "18:00:00"
-                            }
-                        ]
-                    }
-                """;
-
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(requestWithBlankDayOfWeek))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Error JSON Inválido - JSON parse error: Cannot coerce empty String (\\\"\\\") to `java.time.DayOfWeek`")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenDayOfWeekIsNotProvidedOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .openAt("08:00:00")
-                .closeAt("18:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of week must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenTimeIsInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt("08:00")
-                .closeAt("18:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenTimeIsNullOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt(null)
-                .closeAt("18:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenTimeIsNotProvidesOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .closeAt("18:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenCloseTimeIsInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt("08:00:00")
-                .closeAt("24:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenCloseTimeIsNullOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt("08:00:00")
-                .closeAt(null)
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Close time must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenCloseTimeIsNotProvidedOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt("08:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Close time must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenAndCloseTimeAreInvalidOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt("08:00")
-                .closeAt("24:00:00")
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("businessHours[0].closeAt: Invalid closing time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")))
-                .andExpect(content().string(containsString("businessHours[0].openAt: Invalid opening time. Times must be in 24-hour format, i.e., HH:mm:ss (e.g., 08:00:00 or 23:59:00)")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenAndCloseTimeAreNullsOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .openAt(null)
-                .closeAt(null)
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")))
-                .andExpect(content().string(containsString("Close time must be provided.")));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenOpenAndCloseTimeAreNotProvidedOnPost() throws Exception {
-        // Arrange
-        BusinessHourDTORequest businessHour = BusinessHourDTORequest.builder()
-                .dayOfWeek(DayOfWeek.MONDAY)
-                .build();
-
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-        request.businessHours().clear();
-        request.businessHours().add(businessHour);
-
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")))
-                .andExpect(content().string(containsString("Close time must be provided.")));
-    }
 
     @Test
     void shouldReturnBadRequestWhenBusinessHoursIsNullOnPatch() throws Exception {
@@ -923,19 +450,20 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        sellerRepository.save(seller);
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(null)
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
     @Test
@@ -944,18 +472,19 @@ class SellerServiceComponentTest extends AbstractComponentTest {
         // Arrange
         String countryCode = ConstantsMocks.COUNTRY_CODE_BR;
         Seller seller = SellerBuilder.createDefault(countryCode);
+        sellerRepository.save(seller);
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
+                .andExpect(jsonPath(ConstantsMocks.JSON_PATH_ERROR).value(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED));
     }
 
     @Test
@@ -970,7 +499,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .build();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -993,7 +522,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 """;
 
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1010,8 +539,8 @@ class SellerServiceComponentTest extends AbstractComponentTest {
 
         BusinessHourDTORequest dto = BusinessHourDTORequest.builder()
                 .dayOfWeek(null)
-                .openAt("08:00:00")
-                .closeAt("18:00:00")
+                .openAt(ConstantsMocks.TIME_08h00m00)
+                .closeAt(ConstantsMocks.TIME_18h00m00)
                 .build();
 
         List<BusinessHourDTORequest> businessHours = new ArrayList<>();
@@ -1021,13 +550,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of week must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_DAY_OF_WEEK_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1048,13 +577,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Day of week must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_DAY_OF_WEEK_MUST_BE_PROVIDED)));
     }
 
 
@@ -1077,7 +606,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                     }
                 """;
 
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1105,7 +634,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                     }
                 """;
 
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1133,7 +662,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1161,13 +690,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_OPEN_TIME_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1188,13 +717,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_OPEN_TIME_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1216,7 +745,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1244,13 +773,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Close time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_CLOSE_TIME_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1271,13 +800,13 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Close time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_CLOSE_TIME_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1299,7 +828,7 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
@@ -1328,14 +857,14 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")))
-                .andExpect(content().string(containsString("Close time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_OPEN_TIME_MUST_BE_PROVIDED)))
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_CLOSE_TIME_MUST_BE_PROVIDED)));
     }
 
     @Test
@@ -1355,53 +884,14 @@ class SellerServiceComponentTest extends AbstractComponentTest {
                 .businessHours(businessHours)
                 .build();
         // Act & Assert
-        mockMvc.perform(patch("/api/seller/patch/{code}", seller.getCode())
+        mockMvc.perform(patch(ConstantsMocks.URI_TEMPLATE_PATCH_UPDATE, seller.getCode())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
                         .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Open time must be provided.")))
-                .andExpect(content().string(containsString("Close time must be provided.")));
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_OPEN_TIME_MUST_BE_PROVIDED)))
+                .andExpect(content().string(containsString(MessageErrorConstants.ERROR_CLOSE_TIME_MUST_BE_PROVIDED)));
     }
 
-    @ParameterizedTest
-    @MethodSource("geoCoordinatesProvider")
-    void shouldReturnBadRequestWhenGeoCoordinatesAreOutOfRange(Double latitude, Double longitude, String expectedLatitudeError, String expectedLongitudeError) throws Exception {
-        // Arrange
-        SellerDTORequest request = SellerDTORequestBuilder.createDefault();
-
-        GeoCoordinatesDTORequest geoCoordinates = GeoCoordinatesDTORequest.builder()
-                .latitude(latitude)
-                .longitude(longitude)
-                .build();
-
-        SellerDTORequest request2 = SellerDTORequestBuilder.createWithCustomGeoCoordinates(request, geoCoordinates);
-
-        // Act & Assert
-        mockMvc.perform(post("/api/seller/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)
-                        .header(HeaderConstants.HEADER_PROFILE, Profile.ADMIN.name())
-                        .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString(expectedLatitudeError)))
-                .andExpect(content().string(containsString(expectedLongitudeError)));
-    }
-
-
-    private static Stream<Arguments> geoCoordinatesProvider() {
-        return Stream.of(
-                // Testes para Latitude
-                Arguments.of(-100.0, -46.6333, "Latitude must be >= -90.0", ""),
-                Arguments.of(100.0, -46.6333, "Latitude must be <= 90.0", ""),
-
-                // Testes para Longitude
-                Arguments.of(-23.5505, -200.0, "", "Longitude must be >= -180.0"),
-                Arguments.of(-23.5505, 200.0, "", "Longitude must be <= 180.0"),
-
-                // Testes para ambos
-                Arguments.of(-100.0, 200.0, "Latitude must be >= -90.0", "Longitude must be <= 180.0")
-        );
-    }
 }

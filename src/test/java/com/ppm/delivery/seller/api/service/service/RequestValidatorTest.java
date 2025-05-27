@@ -6,6 +6,7 @@ import com.ppm.delivery.seller.api.service.api.domain.request.header.Metadata;
 import com.ppm.delivery.seller.api.service.api.interceptor.RequestValidator;
 import com.ppm.delivery.seller.api.service.exception.CountryNotSupportedException;
 import com.ppm.delivery.seller.api.service.exception.ProfileNotSupportedException;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,62 +42,58 @@ public class RequestValidatorTest {
         assertThrows(CountryNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
-    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenCountryIsNotSupported() {
 
         Metadata metadata = mock(Metadata.class);
-        when(metadata.country()).thenReturn("AR"); // país em branco
+        when(metadata.country()).thenReturn(ConstantsMocks.COUNTRY_CODE_AR); // país em branco
 
         Header header = mock(Header.class);
         when(header.metadata()).thenReturn(metadata);
 
-        when(sellerConfig.getSupportedCountries()).thenReturn(List.of("BR", "US"));
+        when(sellerConfig.getSupportedCountries()).thenReturn(List.of(ConstantsMocks.COUNTRY_CODE_BR, ConstantsMocks.COUNTRY_CODE_US));
 
         assertThrows(CountryNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
-    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenProfileIsBlank() {
 
         Metadata metadata = Mockito.mock(Metadata.class);
-        when(metadata.country()).thenReturn("BR");
+        when(metadata.country()).thenReturn(ConstantsMocks.COUNTRY_CODE_BR);
         when(metadata.profile()).thenReturn("  ");
 
         Header header = Mockito.mock(Header.class);
         when(header.metadata()).thenReturn(metadata);
-        when(sellerConfig.getSupportedCountries()).thenReturn(List.of("BR"));
+        when(sellerConfig.getSupportedCountries()).thenReturn(List.of(ConstantsMocks.COUNTRY_CODE_BR));
 
         assertThrows(ProfileNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
-    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldThrowExceptionWhenProfileIsInvalid() {
 
         Metadata metadata = Mockito.mock(Metadata.class);
-        when(metadata.country()).thenReturn("BR");
-        when(metadata.profile()).thenReturn("INVALID_PROFILE");
+        when(metadata.country()).thenReturn(ConstantsMocks.COUNTRY_CODE_BR);
+        when(metadata.profile()).thenReturn(ConstantsMocks.JSON_INVALID_PROFILE);
 
         Header header = Mockito.mock(Header.class);
         when(header.metadata()).thenReturn(metadata);
-        when(sellerConfig.getSupportedCountries()).thenReturn(List.of("BR"));
+        when(sellerConfig.getSupportedCountries()).thenReturn(List.of(ConstantsMocks.COUNTRY_CODE_BR));
 
         assertThrows(ProfileNotSupportedException.class, () -> requestValidator.validateHeader(header));
     }
 
-    // TODO atg ReviewCode: Use constantes(ConstantsMocks) para os países
     @Test
     void shouldNotThrowExceptionWhenHeaderIsValid() {
 
         Metadata metadata = Mockito.mock(Metadata.class);
-        when(metadata.country()).thenReturn("BR");
-        when(metadata.profile()).thenReturn("ADMIN");
+        when(metadata.country()).thenReturn(ConstantsMocks.COUNTRY_CODE_BR);
+        when(metadata.profile()).thenReturn(ConstantsMocks.ADMIN_PROFILE);
 
         Header header = Mockito.mock(Header.class);
         when(header.metadata()).thenReturn(metadata);
-        when(sellerConfig.getSupportedCountries()).thenReturn(List.of("BR"));
+        when(sellerConfig.getSupportedCountries()).thenReturn(List.of(ConstantsMocks.COUNTRY_CODE_BR));
 
         assertDoesNotThrow(() -> requestValidator.validateHeader(header));
     }
