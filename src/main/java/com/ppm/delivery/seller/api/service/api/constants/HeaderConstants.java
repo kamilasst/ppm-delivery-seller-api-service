@@ -17,6 +17,4 @@ public class HeaderConstants {
     public static final String HEADER_PLATFORM = "platform";
     public static final String HEADER_PROFILE = "profile";
 
-
-
 }

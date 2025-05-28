@@ -1,10 +1,11 @@
 package com.ppm.delivery.seller.api.service.builder;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.*;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
+import com.ppm.delivery.seller.api.service.constants.SellerMockConstants;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,130 +14,83 @@ public final class SellerDTORequestBuilder {
     private SellerDTORequestBuilder() {
     }
 
-    public static SellerDTORequest createDefault() {
+    private static SellerDTORequest create(List<BusinessHourDTORequest> businessHours) {
         return SellerDTORequest.builder()
                 .identification(IdentificationDTORequest.builder()
-                        .type("CNPJ")
-                        .code("12345678901435")
+                        .type(SellerMockConstants.DEFAULT_IDENTIFICATION_TYPE)
+                        .code(SellerMockConstants.DEFAULT_IDENTIFICATION_CODE)
                         .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
+                .name(SellerMockConstants.DEFAULT_NAME)
+                .displayName(SellerMockConstants.DEFAULT_DISPLAY_NAME)
                 .contacts(List.of(ContactDTORequest.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
+                        .type(SellerMockConstants.DEFAULT_CONTACT_TYPE)
+                        .value(SellerMockConstants.DEFAULT_CONTACT_VALUE)
                         .build()))
                 .address(AddressDTORequest.builder()
                         .location(LocationDTORequest.builder()
                                 .geoCoordinates(GeoCoordinatesDTORequest.builder()
-                                        .latitude(-23.520930238344484)
-                                        .longitude(-46.905673295259476)
+                                        .latitude(SellerMockConstants.DEFAULT_LATITUDE)
+                                        .longitude(SellerMockConstants.DEFAULT_LONGITUDE)
                                         .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
+                                .city(SellerMockConstants.DEFAULT_CITY)
+                                .country(SellerMockConstants.DEFAULT_COUNTRY)
+                                .state(SellerMockConstants.DEFAULT_STATE)
+                                .number(SellerMockConstants.DEFAULT_NUMBER)
+                                .zipCode(SellerMockConstants.DEFAULT_ZIP_CODE)
+                                .streetAddress(SellerMockConstants.DEFAULT_STREET)
                                 .build())
                         .build())
-                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
-                .businessHours(new ArrayList<>(Arrays.asList(BusinessHourDTORequest.builder()
-                        .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt("00:00:00")
-                        .closeAt("23:59:00")
-                        .build())))
+                .creatorId(SellerMockConstants.DEFAULT_CREATOR_ID)
+                .businessHours(businessHours)
                 .build();
+    }
+
+    public static SellerDTORequest createDefault() {
+        return create(new ArrayList<>(List.of(
+                BusinessHourDTORequest.builder()
+                        .dayOfWeek(DayOfWeek.SUNDAY)
+                        .openAt(ConstantsMocks.TIME_00h00m00)
+                        .closeAt(ConstantsMocks.TIME_23h59m00)
+                        .build()
+        )));
+
     }
 
     public static SellerDTORequest createWithNullBusinessHours() {
-        return SellerDTORequest.builder()
-                .identification(IdentificationDTORequest.builder()
-                        .type("CNPJ")
-                        .code("12345678901435")
-                        .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
-                .contacts(List.of(ContactDTORequest.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
-                        .build()))
-                .address(AddressDTORequest.builder()
-                        .location(LocationDTORequest.builder()
-                                .geoCoordinates(GeoCoordinatesDTORequest.builder()
-                                        .latitude(-23.520930238344484)
-                                        .longitude(-46.905673295259476)
-                                        .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
-                                .build())
-                        .build())
-                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
-                .businessHours(null)
-                .build();
+        return create(null);
     }
 
     public static SellerDTORequest createWithEmptyBusinessHours() {
-        return SellerDTORequest.builder()
-                .identification(IdentificationDTORequest.builder()
-                        .type("CNPJ")
-                        .code("12345678901435")
-                        .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
-                .contacts(List.of(ContactDTORequest.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
-                        .build()))
-                .address(AddressDTORequest.builder()
-                        .location(LocationDTORequest.builder()
-                                .geoCoordinates(GeoCoordinatesDTORequest.builder()
-                                        .latitude(-23.520930238344484)
-                                        .longitude(-46.905673295259476)
-                                        .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
-                                .build())
-                        .build())
-                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
-                .businessHours(Collections.emptyList())
-                .build();
+        return create(new ArrayList<>());
     }
 
     public static SellerDTORequest createWithoutBusinessHours() {
         return SellerDTORequest.builder()
                 .identification(IdentificationDTORequest.builder()
-                        .type("CNPJ")
-                        .code("12345678901459")
+                        .type(SellerMockConstants.DEFAULT_IDENTIFICATION_TYPE)
+                        .code(SellerMockConstants.DEFAULT_IDENTIFICATION_CODE)
                         .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
+                .name(SellerMockConstants.DEFAULT_NAME)
+                .displayName(SellerMockConstants.DEFAULT_DISPLAY_NAME)
                 .contacts(List.of(ContactDTORequest.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
+                        .type(SellerMockConstants.DEFAULT_CONTACT_TYPE)
+                        .value(SellerMockConstants.DEFAULT_CONTACT_VALUE)
                         .build()))
                 .address(AddressDTORequest.builder()
                         .location(LocationDTORequest.builder()
                                 .geoCoordinates(GeoCoordinatesDTORequest.builder()
-                                        .latitude(-23.520930238344484)
-                                        .longitude(-46.905673295259476)
+                                        .latitude(SellerMockConstants.DEFAULT_LATITUDE)
+                                        .longitude(SellerMockConstants.DEFAULT_LONGITUDE)
                                         .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
+                                .city(SellerMockConstants.DEFAULT_CITY)
+                                .country(SellerMockConstants.DEFAULT_COUNTRY)
+                                .state(SellerMockConstants.DEFAULT_STATE)
+                                .number(SellerMockConstants.DEFAULT_NUMBER)
+                                .zipCode(SellerMockConstants.DEFAULT_ZIP_CODE)
+                                .streetAddress(SellerMockConstants.DEFAULT_STREET)
                                 .build())
                         .build())
-                .creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637")
+                .creatorId(SellerMockConstants.DEFAULT_CREATOR_ID)
                 .build();
     }
 

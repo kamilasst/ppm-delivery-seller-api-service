@@ -15,9 +15,8 @@ import com.ppm.delivery.seller.api.service.domain.profile.Profile;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
-import com.ppm.delivery.seller.api.service.exception.RequiredFieldsException;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
-import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class SellerServiceTest {
@@ -42,12 +44,10 @@ public class SellerServiceTest {
     @Mock
     private ContextHolder contextHolder;
 
-    private final SellerUpdateHelper sellerUpdateHelper = new SellerUpdateHelper();
-
     @BeforeEach
     void setUp() {
         PermissionService permissionValidator = new PermissionService(contextHolder);
-        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator, sellerUpdateHelper);
+        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator);
     }
 
     @Test
@@ -176,12 +176,12 @@ public class SellerServiceTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_17h30m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -201,14 +201,14 @@ public class SellerServiceTest {
         BusinessHour updatedSunday = seller.getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, updatedSunday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, updatedSunday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_08h30m00, updatedSunday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_17h30m00, updatedSunday.getCloseAt());
 
         BusinessHour newMonday = seller.getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, newMonday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, newMonday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_09h00m00, newMonday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_18h00m00, newMonday.getCloseAt());
 
         Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.times(1)).save(seller);
@@ -232,13 +232,13 @@ public class SellerServiceTest {
         List<BusinessHourDTORequest> businessHoursList = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_2)
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_17h30m00)
                         .build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3)
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00)
                         .build()
         );
 
@@ -261,14 +261,14 @@ public class SellerServiceTest {
         BusinessHour sunday = seller.getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.SUNDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_2, sunday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_2, sunday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_08h30m00, sunday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_17h30m00, sunday.getCloseAt());
 
         BusinessHour monday = seller.getBusinessHours().stream()
                 .filter(bh -> DayOfWeek.MONDAY.name().equals(bh.getDayOfWeek()))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_OPEN_AT_3, monday.getOpenAt());
-        Assertions.assertEquals(ConstantsMocks.EXPECTED_CLOSE_AT_3, monday.getCloseAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_09h00m00, monday.getOpenAt());
+        Assertions.assertEquals(ConstantsMocks.TIME_18h00m00, monday.getCloseAt());
 
         Mockito.verify(sellerRepository, Mockito.times(1)).findByCode(seller.getCode());
         Mockito.verify(contextHolder, Mockito.times(1)).getProfile();
@@ -365,8 +365,8 @@ public class SellerServiceTest {
         );
 
         Assertions.assertEquals(MessageErrorConstants.ERROR_REQUEST_BODY_IS_REQUIRED, exception.getMessage());
-        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
-        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any(Seller.class));
+        Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(sellerRepository).findByCode(seller.getCode());
     }
 
     @Test
@@ -374,6 +374,9 @@ public class SellerServiceTest {
 
         // Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.findByCode(seller.getCode()))
+                .thenReturn(Optional.of(seller));
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .businessHours(null)
@@ -385,7 +388,7 @@ public class SellerServiceTest {
         );
 
         // Assert
-        Assertions.assertEquals("Status or business hours are required", exception.getMessage());
+        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
     }
 
     @Test
@@ -397,13 +400,16 @@ public class SellerServiceTest {
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .build();
 
+        Mockito.when(sellerRepository.findByCode(seller.getCode()))
+                .thenReturn(Optional.of(seller));
+
         //Act e Assert
         BusinessException exception = Assertions.assertThrows(BusinessException.class,
                 () -> sellerService.update(seller.getCode(), request)
         );
 
         // Assert
-        Assertions.assertEquals("Status or business hours are required", exception.getMessage());
+        Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
     }
 
     @Test
@@ -411,6 +417,8 @@ public class SellerServiceTest {
 
         //Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+        Mockito.when(sellerRepository.findByCode(seller.getCode()))
+                .thenReturn(Optional.of(seller));
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(null)
@@ -423,8 +431,8 @@ public class SellerServiceTest {
         );
 
         Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
-        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(sellerRepository).findByCode(seller.getCode());
     }
 
     @Test
@@ -432,6 +440,8 @@ public class SellerServiceTest {
 
         //Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.of(seller));
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .status(null)
@@ -444,8 +454,9 @@ public class SellerServiceTest {
         );
 
         Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
-        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(sellerRepository).findByCode(seller.getCode());
+
     }
 
     @Test
@@ -453,6 +464,8 @@ public class SellerServiceTest {
 
         //Arrange
         Seller seller = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.findByCode(seller.getCode())).thenReturn(Optional.of(seller));
 
         SellerUpdateDTORequest request = SellerUpdateDTORequest.builder()
                 .build();
@@ -463,8 +476,9 @@ public class SellerServiceTest {
         );
 
         Assertions.assertEquals(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED, exception.getMessage());
-        Mockito.verify(sellerRepository, Mockito.never()).findByCode(seller.getCode());
         Mockito.verify(sellerRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(sellerRepository).findByCode(seller.getCode());
+
     }
 
 

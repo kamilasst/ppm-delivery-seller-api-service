@@ -1,9 +1,10 @@
 package com.ppm.delivery.seller.api.service.builder;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.*;
+import com.ppm.delivery.seller.api.service.constants.SellerMockConstants;
 import com.ppm.delivery.seller.api.service.domain.model.*;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
-import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -12,40 +13,39 @@ import java.util.stream.Collectors;
 public class SellerBuilder {
 
     public static Seller createDefault(String countryCode){
-
         Seller seller = Seller.builder()
                 .code(UUID.randomUUID().toString())
                 .countryCode(countryCode)
                 .identification(Identification.builder()
-                        .type("CNPJ")
-                        .code("12345678901435")
+                        .type(SellerMockConstants.DEFAULT_IDENTIFICATION_TYPE)
+                        .code(SellerMockConstants.DEFAULT_IDENTIFICATION_CODE)
                         .build())
-                .name("Bar do Cuscuz LTDA")
-                .displayName("Bar do Cuscuz")
+                .name(SellerMockConstants.DEFAULT_NAME)
+                .displayName(SellerMockConstants.DEFAULT_DISPLAY_NAME)
                 .contacts(List.of(Contact.builder()
-                        .type("MAIL")
-                        .value("+pTryOZ7hrzjbfz4OuXQ4g==")
+                        .type(SellerMockConstants.DEFAULT_CONTACT_TYPE)
+                        .value(SellerMockConstants.DEFAULT_CONTACT_VALUE)
                         .build()))
                 .address(Address.builder()
                         .location(Location.builder()
                                 .geoCoordinates(GeoCoordinates.builder()
-                                        .latitude(-23.520930238344484)
-                                        .longitude(-46.905673295259476)
+                                        .latitude(SellerMockConstants.DEFAULT_LATITUDE)
+                                        .longitude(SellerMockConstants.DEFAULT_LONGITUDE)
                                         .build())
-                                .city("Barueri")
-                                .country("BR")
-                                .state("São Paulo")
-                                .number("2161")
-                                .zipCode("51021-200")
-                                .streetAddress("Avenida Henrique Gonçalves Baptista")
+                                .city(SellerMockConstants.DEFAULT_CITY)
+                                .country(SellerMockConstants.DEFAULT_COUNTRY)
+                                .state(SellerMockConstants.DEFAULT_STATE)
+                                .number(SellerMockConstants.DEFAULT_NUMBER)
+                                .zipCode(SellerMockConstants.DEFAULT_ZIP_CODE)
+                                .streetAddress(SellerMockConstants.DEFAULT_STREET)
                                 .build())
                         .build()).
-                creatorId("d41f2c7b-c04e-4c2a-b084-8bec13261637").
+                creatorId(SellerMockConstants.DEFAULT_CREATOR_ID).
                 status(Status.PENDING).
                 businessHours(new ArrayList<>(Arrays.asList(BusinessHour.builder().
-                        dayOfWeek("SUNDAY").
-                        openAt(ConstantsMocks.EXPECTED_OPEN_AT_1).
-                        closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_1).
+                        dayOfWeek(SellerMockConstants.DEFAULT_DAY_OF_WEEK).
+                        openAt(ConstantsMocks.TIME_00h00m00).
+                        closeAt(ConstantsMocks.TIME_23h59m00).
                         build()))).
                 audit(Audit.builder()
                         .createdAt(LocalDateTime.now())

@@ -1,6 +1,5 @@
-package com.ppm.delivery.seller.api.service.controller;
+package com.ppm.delivery.seller.api.service.api.controller;
 
-import com.ppm.delivery.seller.api.service.api.controller.SellerController;
 import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
@@ -14,7 +13,7 @@ import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.service.SellerService;
-import com.ppm.delivery.seller.api.service.utils.ConstantsMocks;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,12 +110,12 @@ public class SellerControllerTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
@@ -145,12 +144,12 @@ public class SellerControllerTest {
         List<BusinessHourDTORequest> businessHoursList  = List.of(
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.SUNDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_2)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build(),
+                        .openAt(ConstantsMocks.TIME_08h30m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build(),
                 BusinessHourDTORequest.builder()
                         .dayOfWeek(DayOfWeek.MONDAY)
-                        .openAt(ConstantsMocks.EXPECTED_OPEN_AT_3)
-                        .closeAt(ConstantsMocks.EXPECTED_CLOSE_AT_3).build());
+                        .openAt(ConstantsMocks.TIME_09h00m00)
+                        .closeAt(ConstantsMocks.TIME_18h00m00).build());
 
         SellerUpdateDTORequest sellerUpdateDTORequest = SellerUpdateDTORequest.builder()
                 .businessHours(businessHoursList)
