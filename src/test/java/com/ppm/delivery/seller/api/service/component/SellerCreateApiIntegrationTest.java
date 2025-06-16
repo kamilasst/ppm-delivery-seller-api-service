@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-class SellerServiceComponentPOSTTest extends AbstractComponentTest {
+class SellerCreateApiIntegrationTest extends AbstractComponentTest {
 
     @Test
     @DisplayName("Should successfully POST With Profile is User")
@@ -508,15 +508,12 @@ class SellerServiceComponentPOSTTest extends AbstractComponentTest {
 
     private static Stream<Arguments> geoCoordinatesProvider() {
         return Stream.of(
-                // Testes para Latitude
                 Arguments.of(-100.0, -46.6333, "Latitude must be >= -90.0", ""),
                 Arguments.of(100.0, -46.6333, "Latitude must be <= 90.0", ""),
 
-                // Testes para Longitude
                 Arguments.of(-23.5505, -200.0, "", "Longitude must be >= -180.0"),
                 Arguments.of(-23.5505, 200.0, "", "Longitude must be <= 180.0"),
 
-                // Testes para ambos
                 Arguments.of(-100.0, 200.0, "Latitude must be >= -90.0", "Longitude must be <= 180.0")
         );
     }

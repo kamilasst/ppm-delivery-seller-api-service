@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,7 @@ public class Seller {
     private String displayName;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Contact> contacts = new ArrayList<>();
 
     @Embedded
@@ -44,6 +46,7 @@ public class Seller {
     private Status status;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<BusinessHour> businessHours;
 
     @Embedded

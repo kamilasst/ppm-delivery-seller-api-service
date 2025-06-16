@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,23 +14,28 @@ import java.util.Optional;
 public interface ISellerRepository extends JpaRepository<Seller, String> {
 
     boolean existsByIdentificationCode(String identificationCode);
+
     Optional<Seller> findByCode(String code);
 
     @Query(value = """
-   SELECT * FROM seller s
-   WHERE s.status = 'ACTIVE'
-   AND (
-       6371000 * acos(
-           cos(radians(:lat)) * cos(radians(s.location_latitude)) *
-           cos(radians(s.location_longitude) - radians(:lng)) +
-           sin(radians(:lat)) * sin(radians(s.location_latitude))
-       )
-   ) <= :radius
-""", nativeQuery = true)
+               SELECT s.* FROM seller s
+               JOIN business_hour bh ON s.code = bh.seller_code
+               WHERE s.status = 'ACTIVE'
+               AND (
+                   6371000 * acos(
+                       cos(radians(:lat)) * cos(radians(s.location_latitude)) *
+                       cos(radians(s.location_longitude) - radians(:lng)) +
+                       sin(radians(:lat)) * sin(radians(s.location_latitude))
+                   )
+               ) <= :radius
+            AND bh.day_of_week = UPPER(TRIM(TO_CHAR(CAST(:orderCreateDate AS TIMESTAMP), 'Day')))
+            AND CAST(CAST(:orderCreateDate AS TIMESTAMP) AS TIME) BETWEEN CAST(bh.open_at AS TIME) AND CAST(bh.close_at AS TIME)
+            """, nativeQuery = true)
     List<Seller> findActiveSellersNear(
             @Param("lat") double latitude,
             @Param("lng") double longitude,
-            @Param("radius") double radiusInMeters
+            @Param("radius") double radiusInMeters,
+            @Param("orderCreateDate") LocalDateTime orderCreateDate
     );
 
 }

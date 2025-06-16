@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,8 +25,9 @@ public class Contact {
     @Column(name = "value", nullable = false, length = 100)
     private String value;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
+    @JsonBackReference
     private Seller seller;
 
     @Embedded
