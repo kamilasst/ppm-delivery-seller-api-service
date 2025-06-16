@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class BusinessHour {
 
     @ManyToOne
     @JoinColumn(name = "seller_code", referencedColumnName = "code", nullable = false)
+    @JsonBackReference
     private Seller seller;
 
     @Embedded

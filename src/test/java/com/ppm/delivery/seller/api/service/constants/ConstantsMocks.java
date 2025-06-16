@@ -23,6 +23,7 @@ public class ConstantsMocks {
 
     public static final String URI_TEMPLATE_PATCH_UPDATE = "/api/seller/patch/{code}";
     public static final String URI_TEMPLATE_POST_CREATE = "/api/seller/create";
+    public static final String URI_TEMPLATE_POST_AVAILABLE = "/api/seller/available";
 
     public static final String JSON_PATH_ERROR = "$.error";
     public static final String JSON_INVALID_PROFILE = "INVALID_PROFILE";

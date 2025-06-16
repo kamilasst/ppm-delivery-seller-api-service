@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.service;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerNearSearchRequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
@@ -18,7 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SellerService implements ISellerService {
@@ -70,6 +75,26 @@ public class SellerService implements ISellerService {
         );
     }
 
+    @Override
+    public List<Seller> getAvailableSellers(SellerNearSearchRequest request) {
+
+        List<Seller> sellers = sellerRepository.findActiveSellersNear(
+
+                request.orderDeliveryInfo().latitude(),
+                request.orderDeliveryInfo().longitude(),
+                request.radius(),
+                request.orderCreateDate());
+
+        return sellers.stream()
+                .map(seller -> {
+                    if (request.projections() == null || request.projections().isEmpty()) {
+                        return seller;
+                    }
+                    return null;
+                })
+                .collect(Collectors.toList());
+    }
+
     private void validateCreate(SellerDTORequest sellerDTORequest) {
 
         validateRequestNull(sellerDTORequest);
@@ -92,7 +117,7 @@ public class SellerService implements ISellerService {
     }
 
     private void validateIdentificationCode(String identificationCode) {
-        if (sellerRepository.existsByIdentificationCode(identificationCode)){
+        if (sellerRepository.existsByIdentificationCode(identificationCode)) {
             throw new BusinessException(MessageErrorConstants.ERROR_IDENTIFICATION_CODE_ALREADY_EXISTS);
         }
     }
