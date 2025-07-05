@@ -12,6 +12,7 @@ public class ConstantsMocks {
     public static final String TIME_08h30m00 = "08:30:00";
     public static final String TIME_09h00m00 = "09:00:00";
     public static final String TIME_10h00m00 = "10:00:00";
+    public static final String TIME_12h00m00 = "12:00:00";
     public static final String TIME_17h30m00 = "17:30:00";
     public static final String TIME_18h00m00 = "18:00:00";
     public static final String TIME_23h59m00 = "23:59:00";
@@ -50,4 +51,24 @@ public class ConstantsMocks {
                         ]
                     }
                 """;
+
+    public static final double LATITUDE_RECIFE_BOAVISTA_1 = -8.0578;
+    public static final double LONGITUDE_RECIFE_BOAVISTA_1 = -34.8824;
+    public static final double LATITUDE_RECIFE_BOAVISTA_2 = -8.0570;
+    public static final double LONGITUDE_RECIFE_BOAVISTA_2 = -34.8820;
+    public static final double LATITUDE_RECIFE_BOAVISTA_3 = -8.0560;
+    public static final double LONGITUDE_RECIFE_BOAVISTA_3 = -34.8810;
+    public static final double LATITUDE_RECIFE_BOAVISTA_4 = -8.0575;
+    public static final double LONGITUDE_RECIFE_BOAVISTA_4 = -34.8825;
+
+    public static final double LATITUDE_RECIFE_BOAVIAGEM_1 = -8.13211;
+    public static final double LONGITUDE_RECIFE_BOAVIAGEM_1 = -34.90104;
+
+    public static final double LATITUDE_SAO_PAULO = -23.5489 ;
+    public static final double LONGITUDE_SAO_PAULO = -46.6389 ;
+
+    public static final double RAIO_2KM = 2000.0;
+
+
+
 }

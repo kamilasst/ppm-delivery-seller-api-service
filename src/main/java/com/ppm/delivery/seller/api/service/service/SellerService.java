@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -78,16 +79,23 @@ public class SellerService implements ISellerService {
     @Override
     public List<Seller> getAvailableSellers(SellerNearSearchRequest request) {
 
-        List<Seller> sellers = sellerRepository.findActiveSellersNear(
+        final String countryCode = contextHolder.getCountry();
 
+        String dayOfWeek = request.orderCreateDate().getDayOfWeek().name();
+        String orderHours = request.orderCreateDate().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        List<Seller> sellers = sellerRepository.findActiveSellersNear(
                 request.orderDeliveryInfo().latitude(),
                 request.orderDeliveryInfo().longitude(),
                 request.radius(),
-                request.orderCreateDate());
+                dayOfWeek,
+                orderHours,
+                countryCode);
 
         return sellers.stream()
                 .map(seller -> {
-                    if (request.projections() == null || request.projections().isEmpty()) {
+                    if (request.projections() == null || request.projections()
+                            .isEmpty()) {
                         return seller;
                     }
                     return null;

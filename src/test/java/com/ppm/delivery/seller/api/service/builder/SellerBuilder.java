@@ -194,4 +194,23 @@ public class SellerBuilder {
         return seller;
     }
 
+    public static Seller createWithCoordinates(String countryCode, Status status, double latitude, double longitude) {
+        Seller seller = createDefault(countryCode);
+        seller.setStatus(status);
+        seller.setIdentification(Identification.builder()
+                .type(SellerMockConstants.DEFAULT_IDENTIFICATION_TYPE)
+                .code(UUID.randomUUID().toString())
+                .build());
+
+        if (seller.getAddress() == null) seller.setAddress(Address.builder().build());
+        if (seller.getAddress().getLocation() == null) seller.getAddress().setLocation(Location.builder().build());
+        if (seller.getAddress().getLocation().getGeoCoordinates() == null) {
+            seller.getAddress().getLocation().setGeoCoordinates(GeoCoordinates.builder().build());
+        }
+        seller.getAddress().getLocation().getGeoCoordinates().setLatitude(latitude);
+        seller.getAddress().getLocation().getGeoCoordinates().setLongitude(longitude);
+
+        return seller;
+    }
+
 }
