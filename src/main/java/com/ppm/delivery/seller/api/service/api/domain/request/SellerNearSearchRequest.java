@@ -1,5 +1,6 @@
 package com.ppm.delivery.seller.api.service.api.domain.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -16,6 +17,7 @@ public record SellerNearSearchRequest(
         LocalDateTime orderCreateDate,
 
         @NotNull(message = "orderDeliveryInfo is required")
+        @Valid
         DeliveryInfoDTO orderDeliveryInfo,
 
         @NotNull(message = "radius is required")

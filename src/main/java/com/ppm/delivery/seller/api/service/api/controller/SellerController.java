@@ -37,9 +37,8 @@ public class SellerController implements ISellerController{
     }
 
     @Override
-    public ResponseEntity<List<Seller>> getAvailableSellers(SellerNearSearchRequest request) {
+    public ResponseEntity<List<Seller>> getAvailableSellers(@Valid @RequestBody SellerNearSearchRequest request) {
         List<Seller> sellers = sellerService.getAvailableSellers(request);
-
 
         if (sellers.isEmpty()) {
             return ResponseEntity.noContent().build();
