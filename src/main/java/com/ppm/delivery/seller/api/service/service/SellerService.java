@@ -76,14 +76,18 @@ public class SellerService implements ISellerService {
         );
     }
 
+    // TODO Review GET - Por favor avalie renomear para searchAvailableNearby
     @Override
     public List<Seller> getAvailableSellers(SellerNearSearchRequest request) {
 
         final String countryCode = contextHolder.getCountry();
 
         String dayOfWeek = request.orderCreateDate().getDayOfWeek().name();
+        // TODO Review GET - Por favor avaliar criar uma classe que será responsável pela formatação de datas.
+        //  Ex.: DateFormatter.getHours(request.orderCreateDate())
         String orderHours = request.orderCreateDate().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
+        // TODO Review GET - Como o country é uma informacao 'forte', avalie passar como o primeiro parâmetro do método
         List<Seller> sellers = sellerRepository.findActiveSellersNear(
                 request.orderDeliveryInfo().latitude(),
                 request.orderDeliveryInfo().longitude(),
@@ -92,10 +96,11 @@ public class SellerService implements ISellerService {
                 orderHours,
                 countryCode);
 
+        // TODO Review GET - Estamos retornando sempre o seller correot ? Acredito que por nao estarmos
+        // usando o projection, por favor avalie remover e simplesmente retornar a lista de sellers
         return sellers.stream()
                 .map(seller -> {
-                    if (request.projections() == null || request.projections()
-                            .isEmpty()) {
+                    if (request.projections() == null || request.projections().isEmpty()) {
                         return seller;
                     }
                     return null;
@@ -154,14 +159,12 @@ public class SellerService implements ISellerService {
     private void validateUpdate(SellerUpdateDTORequest sellerUpdateDTORequest, Optional<Seller> sellerOptional) {
 
         validateRequestNull(sellerUpdateDTORequest);
-
         validateExist(sellerOptional);
-
         validateUpdateStatus(sellerUpdateDTORequest.status());
         validateUpdateStatusAnsBusinessHours(Objects.isNull(sellerUpdateDTORequest.status()), sellerUpdateDTORequest.businessHours());
     }
 
-    private static void validateUpdateStatusAnsBusinessHours(boolean isStatusInvalid, List<BusinessHourDTORequest> businessHours) {
+    private void validateUpdateStatusAnsBusinessHours(boolean isStatusInvalid, List<BusinessHourDTORequest> businessHours) {
         boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(businessHours);
         if (isStatusInvalid && isBusinessHoursInvalid) {
             throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);

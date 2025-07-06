@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +16,8 @@ public interface ISellerRepository extends JpaRepository<Seller, String> {
 
     Optional<Seller> findByCode(String code);
 
+    // TODO Review GET - Por favor avalie renomear para searchAvailableNearby
+    // TODO Review GET - Como o country é uma informacao 'forte', avalie ser a primeira cláusula do WHERE
     @Query(value = """
                SELECT s.* FROM seller s
                JOIN business_hour bh ON s.code = bh.seller_code
