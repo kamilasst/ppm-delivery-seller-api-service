@@ -10,28 +10,143 @@
 			"name": "Seller",
 			"item": [
 				{
-					"name": "http://localhost:8080/api/seller/create",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/seller/create",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"seller",
-								"create"
-							]
+					"name": "Create",
+					"item": [
+						{
+							"name": "create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "country",
+										"value": "BR",
+										"type": "text"
+									},
+									{
+										"key": "profile",
+										"value": "ADMIN",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"identification\": {\r\n    \"type\": \"CNPJ\",\r\n    \"code\": \"12345678901460\"\r\n  },\r\n  \"name\": \"Bar do Cuscuz LTDA\",\r\n  \"displayName\": \"Bar do Cuscuz\",\r\n  \"contacts\": [\r\n    {\r\n      \"type\": \"MAIL\",\r\n      \"value\": \"+pTryOZ7hrzjbfz4OuXQ4g==\"\r\n    }\r\n  ],\r\n  \"address\": {\r\n    \"location\": {\r\n      \"geoCoordinates\": {\r\n        \"latitude\": \"-20.520930238344484\",\r\n        \"longitude\": \"-46.905673295259476\"\r\n      },\r\n      \"city\": \"Barueri\",\r\n      \"country\": \"BR\",\r\n      \"state\": \"São Paulo\",\r\n      \"number\": \"2161\",\r\n      \"zipCode\": \"51021-200\",\r\n      \"streetAddress\": \"Avenida Henrique Gonçalves Baptista\"\r\n    }\r\n  },\r\n  \"creatorId\": \"d41f2c7b-c04e-4c2a-b084-8bec13261637\",\r\n  \"businessHours\": [\r\n    {\r\n      \"dayOfWeek\": \"SUNDAY\",\r\n      \"openAt\": \"08:00:00\",\r\n      \"closeAt\": \"18:00:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"MONDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"TUESDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"WEDNESDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"THURSDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"FRIDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"SATURDAY\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/seller/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"seller",
+										"create"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "Update",
+					"item": [
+						{
+							"name": "patchV2 - flexible data testing",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "country",
+										"value": "BR",
+										"type": "text"
+									},
+									{
+										"key": "profile",
+										"value": "ADMIN",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"businessHours\": [\r\n    {\r\n      \"dayOfWeek\": \"acbgy\",\r\n      \"openAt\": \"24:00:00\",\r\n      \"closeAt\": \"18:00:00\"\r\n    }]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/seller/patch/:code",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"seller",
+										"patch",
+										":code"
+									],
+									"variable": [
+										{
+											"key": "code",
+											"value": "ce07805b-0b52-47f8-9921-1056c328c097"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patchV1 - full data version",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "country",
+										"value": "BR",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status\": \"ACTIVE\",\r\n    \"businessHours\": [\r\n    {\r\n      \"dayOfWeek\": \"sunday\",\r\n      \"openAt\": \"08:00:00\",\r\n      \"closeAt\": \"18:00:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"monday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"tuesday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"wednesday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"thursday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"friday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    },\r\n    {\r\n      \"dayOfWeek\": \"saturday\",\r\n      \"openAt\": \"00:00:00\",\r\n      \"closeAt\": \"23:59:00\"\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/seller/patch/fd582293-408d-4752-991c-a409e0e7a8ae",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"seller",
+										"patch",
+										"fd582293-408d-4752-991c-a409e0e7a8ae"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
