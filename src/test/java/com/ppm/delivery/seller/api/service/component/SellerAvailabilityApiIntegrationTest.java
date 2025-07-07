@@ -26,16 +26,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
+// TODO Review GET - Avaliar renomear para SellerGetAvailableComponentTest(ou seja, Nome Entidade + HTTPMetodo + Operacao Realizada + ComponentTest)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
 public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest {
 
+    // TODO Review GET - Avaliar retornar shouldReturnOkGetAvailableSellers - Como o teste ve vários cenários,
+    // avaliar colocar um @DisplayName e explicar oque o teste faz
     @Test
     void shouldReturnOkAndActiveSellersNear() throws Exception {
 
         //Arrange
 
+        // TODO Review GET - Não é uma boa prática criar variaveis com nome "seller1", "seller2"... avalie criar com um nome explicativo:
+        // ex.: sellerActiveWithinRangeOpen, sellerInactiveOutsideRange, etc.
         //Vendedor 1 (Ativo, dentro do raio, ABERTO no horário de teste)
         Seller seller1 = SellerBuilder.createWithCoordinates(ConstantsMocks.COUNTRY_CODE_BR, Status.ACTIVE, ConstantsMocks.LATITUDE_RECIFE_BOAVISTA_2, ConstantsMocks.LONGITUDE_RECIFE_BOAVISTA_2);
         seller1.getBusinessHours().clear();
@@ -98,6 +104,8 @@ public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest 
         Seller seller7 = SellerBuilder.createWithCoordinates(ConstantsMocks.COUNTRY_CODE_BR, Status.ACTIVE,  ConstantsMocks.LATITUDE_RECIFE_BOAVISTA_1, ConstantsMocks.LONGITUDE_RECIFE_BOAVISTA_1);
         seller7.getBusinessHours().clear();
 
+        // TODO Review GET - Avaliar criar um seller com uma lista de BusinessHours(todos os dias da semana) com horários diferentes e um deles ser dentrdo do horário do filtro
+
         List<BusinessHour> seller7BusinessHours = new ArrayList<>();
         BusinessHour bh4 = BusinessHour.builder()
                 .dayOfWeek(DayOfWeek.FRIDAY.name())
@@ -110,6 +118,7 @@ public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest 
 
         sellerRepository.saveAll(List.of(seller1, seller2, seller3, seller4, seller5, seller6, seller7));
 
+        // TODO Review GET - Remova o comentário abaixo e renomeie a variável para algo mais descritivo
         // --- Data e hora do pedido para o teste ---
         // Simula um pedido criado na Sexta-feira, 13 de junho de 2025, às 10:00 AM
         LocalDateTime orderTime = LocalDateTime.of(2025, 6, 13, 10, 0, 0);
@@ -150,6 +159,7 @@ public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest 
     void shouldReturnEmptyListWhenNoSellersMatchCriteria() throws Exception {
         // Arrange
 
+        // TODO Review GET - Não é uma boa prática criar variaveis com nome "seller1", "seller2"...
         //Vendedor fora do país
         Seller seller1 = SellerBuilder.createWithCoordinates(ConstantsMocks.COUNTRY_CODE_AR, Status.ACTIVE, ConstantsMocks.LATITUDE_RECIFE_BOAVISTA_1, ConstantsMocks.LONGITUDE_RECIFE_BOAVISTA_1);
         seller1.getBusinessHours().clear();
@@ -225,6 +235,14 @@ public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest 
     @Test
     void shouldReturnBadRequestWhenRequiredFieldsAreMissingOrInvalid() throws Exception {
         // Arrange: JSON com campos inválidos (todos nulos ou fora da faixa permitida)
+
+        // TODO Review GET - Avaliar pasar o objeto request com os valores invalidos, ao invés de um JSON
+//        SellerNearSearchRequest request = new SellerNearSearchRequest(
+//                null,
+//                null,
+//                null,
+//                null
+//        );
         String invalidRequestJson = """
         {
             "orderCreateDate": null,
@@ -236,7 +254,10 @@ public class SellerAvailabilityApiIntegrationTest extends AbstractComponentTest 
         }
         """;
 
+
+
         // Act & Assert
+        // TODO Review GET - Avaliar remover o "var resultActions =" pois nao está sendo usado
         var resultActions = mockMvc.perform(post(ConstantsMocks.URI_TEMPLATE_POST_AVAILABLE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HeaderConstants.HEADER_COUNTRY, ConstantsMocks.COUNTRY_CODE_BR)

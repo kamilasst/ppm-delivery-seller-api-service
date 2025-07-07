@@ -9,5 +9,5 @@ public class PpmDeliverySellerApiServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PpmDeliverySellerApiServiceApplication.class, args);
 	}
-
+    // TODO Review GET - Adicionar scripts do postman em docs/api-collections de POST(create) PATCH(update) e GET(consultar seller disponiveis)
 }

@@ -36,6 +36,7 @@ public class SellerController implements ISellerController{
         return ResponseEntity.ok(response);
     }
 
+    // TODO Review GET - Por favor avalie renomear para searchAvailableNearby
     @Override
     public ResponseEntity<List<Seller>> getAvailableSellers(@Valid @RequestBody SellerNearSearchRequest request) {
         List<Seller> sellers = sellerService.getAvailableSellers(request);
