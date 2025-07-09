@@ -1,6 +1,7 @@
 package com.ppm.delivery.seller.api.service.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +35,7 @@ public class BusinessHour {
     private Seller seller;
 
     @Embedded
+    @JsonIgnore
     private Audit audit;
 
     @Override

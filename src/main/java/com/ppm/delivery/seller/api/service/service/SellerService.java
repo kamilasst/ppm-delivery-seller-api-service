@@ -15,6 +15,7 @@ import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
+import com.ppm.delivery.seller.api.service.utils.DateFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -77,30 +78,22 @@ public class SellerService implements ISellerService {
     }
 
     @Override
-    public List<Seller> getAvailableSellers(SellerNearSearchRequest request) {
+    public List<Seller> searchAvailableNearby(SellerNearSearchRequest request) {
 
         final String countryCode = contextHolder.getCountry();
 
         String dayOfWeek = request.orderCreateDate().getDayOfWeek().name();
-        String orderHours = request.orderCreateDate().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String orderHours = DateFormatter.getHours(request.orderCreateDate());
 
-        List<Seller> sellers = sellerRepository.findActiveSellersNear(
+        List<Seller> sellers = sellerRepository.searchAvailableNearby(
+                countryCode,
                 request.orderDeliveryInfo().latitude(),
                 request.orderDeliveryInfo().longitude(),
                 request.radius(),
                 dayOfWeek,
-                orderHours,
-                countryCode);
+                orderHours);
 
-        return sellers.stream()
-                .map(seller -> {
-                    if (request.projections() == null || request.projections()
-                            .isEmpty()) {
-                        return seller;
-                    }
-                    return null;
-                })
-                .collect(Collectors.toList());
+        return sellers;
     }
 
     private void validateCreate(SellerDTORequest sellerDTORequest) {
@@ -154,14 +147,12 @@ public class SellerService implements ISellerService {
     private void validateUpdate(SellerUpdateDTORequest sellerUpdateDTORequest, Optional<Seller> sellerOptional) {
 
         validateRequestNull(sellerUpdateDTORequest);
-
         validateExist(sellerOptional);
-
         validateUpdateStatus(sellerUpdateDTORequest.status());
         validateUpdateStatusAnsBusinessHours(Objects.isNull(sellerUpdateDTORequest.status()), sellerUpdateDTORequest.businessHours());
     }
 
-    private static void validateUpdateStatusAnsBusinessHours(boolean isStatusInvalid, List<BusinessHourDTORequest> businessHours) {
+    private void validateUpdateStatusAnsBusinessHours(boolean isStatusInvalid, List<BusinessHourDTORequest> businessHours) {
         boolean isBusinessHoursInvalid = CollectionUtils.isEmpty(businessHours);
         if (isStatusInvalid && isBusinessHoursInvalid) {
             throw new BusinessException(MessageErrorConstants.ERROR_STATUS_OR_BUSINESS_HOURS_ARE_REQUIRED);

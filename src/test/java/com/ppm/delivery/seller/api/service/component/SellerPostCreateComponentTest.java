@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-class SellerCreateApiIntegrationTest extends AbstractComponentTest {
+class SellerPostCreateComponentTest extends AbstractComponentTest {
 
     @Test
     @DisplayName("Should successfully POST With Profile is User")

@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-public class SellerUpdateApiIntegrationTest extends AbstractComponentTest{
+public class SellerPatchUpdateComponentTest extends AbstractComponentTest{
 
     @Test
     void shouldSuccessfullyPatchSellerOnlyStatusWhenProfileIsAdmin() throws Exception {

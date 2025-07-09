@@ -23,7 +23,7 @@ public interface ISellerController {
     @PatchMapping("/patch/{code}")
     ResponseEntity<SellerUpdateDTOResponse> patchV1(@Valid @PathVariable String code, @RequestBody SellerUpdateDTORequest sellerUpdateDTO);
 
-    @PostMapping("/available")
-    ResponseEntity<List<Seller>> getAvailableSellers(@Valid @RequestBody SellerNearSearchRequest request);
+    @PostMapping("/search-nearby")
+    ResponseEntity<List<Seller>> searchAvailableNearby(@Valid @RequestBody SellerNearSearchRequest request);
 
 }
