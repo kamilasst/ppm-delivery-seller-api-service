@@ -32,11 +32,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-// TODO Review GET - Avaliar renomear para SellerPatchUpdateComponentTest(ou seja, Nomeentidade + HTTPMetodo + Operacao Realizada + ComponentTest)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-public class SellerUpdateApiIntegrationTest extends AbstractComponentTest{
+public class SellerPatchUpdateComponentTest extends AbstractComponentTest{
 
     @Test
     void shouldSuccessfullyPatchSellerOnlyStatusWhenProfileIsAdmin() throws Exception {

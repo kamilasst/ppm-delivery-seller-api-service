@@ -15,6 +15,7 @@ import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
+import com.ppm.delivery.seller.api.service.utils.DateFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -76,36 +77,23 @@ public class SellerService implements ISellerService {
         );
     }
 
-    // TODO Review GET - Por favor avalie renomear para searchAvailableNearby
     @Override
-    public List<Seller> getAvailableSellers(SellerNearSearchRequest request) {
+    public List<Seller> searchAvailableNearby(SellerNearSearchRequest request) {
 
         final String countryCode = contextHolder.getCountry();
 
         String dayOfWeek = request.orderCreateDate().getDayOfWeek().name();
-        // TODO Review GET - Por favor avaliar criar uma classe que será responsável pela formatação de datas.
-        //  Ex.: DateFormatter.getHours(request.orderCreateDate())
-        String orderHours = request.orderCreateDate().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String orderHours = DateFormatter.getHours(request.orderCreateDate());
 
-        // TODO Review GET - Como o country é uma informacao 'forte', avalie passar como o primeiro parâmetro do método
-        List<Seller> sellers = sellerRepository.findActiveSellersNear(
+        List<Seller> sellers = sellerRepository.searchAvailableNearby(
+                countryCode,
                 request.orderDeliveryInfo().latitude(),
                 request.orderDeliveryInfo().longitude(),
                 request.radius(),
                 dayOfWeek,
-                orderHours,
-                countryCode);
+                orderHours);
 
-        // TODO Review GET - Estamos retornando sempre o seller correot ? Acredito que por nao estarmos
-        // usando o projection, por favor avalie remover e simplesmente retornar a lista de sellers
-        return sellers.stream()
-                .map(seller -> {
-                    if (request.projections() == null || request.projections().isEmpty()) {
-                        return seller;
-                    }
-                    return null;
-                })
-                .collect(Collectors.toList());
+        return sellers;
     }
 
     private void validateCreate(SellerDTORequest sellerDTORequest) {

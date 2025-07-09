@@ -35,11 +35,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// TODO Review GET - Avaliar renomear para SellerPostCreateComponentTest(ou seja, Nomeentidade + HTTPMetodo + Operacao Realizada + ComponentTest)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SpringBootTest(classes = {PpmDeliverySellerApiServiceApplication.class})
-class SellerCreateApiIntegrationTest extends AbstractComponentTest {
+class SellerPostCreateComponentTest extends AbstractComponentTest {
 
     @Test
     @DisplayName("Should successfully POST With Profile is User")

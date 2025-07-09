@@ -13,6 +13,6 @@ public interface ISellerService {
 
     SellerDTOResponse create(SellerDTORequest sellerDTORequest);
     SellerUpdateDTOResponse update(String code, SellerUpdateDTORequest sellerUpdateDTORequest);
-    List<Seller> getAvailableSellers(SellerNearSearchRequest request);
+    List<Seller> searchAvailableNearby(SellerNearSearchRequest request);
 
 }
