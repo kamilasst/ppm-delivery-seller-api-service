@@ -8,6 +8,8 @@ import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTORe
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
 import com.ppm.delivery.seller.api.service.builder.SellerBuilder;
 import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
+import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
+import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
 import com.ppm.delivery.seller.api.service.domain.model.BusinessHour;
 import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
@@ -16,7 +18,6 @@ import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
-import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,15 +40,20 @@ public class SellerServiceTest {
 
     @InjectMocks
     private SellerService sellerService;
+
     @Mock
     private ISellerRepository sellerRepository;
+
     @Mock
     private ContextHolder contextHolder;
 
+    @Mock
+    private SellerMapper sellerMapper;
+
     @BeforeEach
     void setUp() {
-        PermissionService permissionValidator = new PermissionService(contextHolder);
-        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator);
+        PermissionService permissionValidator = new PermissionService(contextHolder); // cria com o mock contextHolder
+        sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator, sellerMapper);
     }
 
     @Test

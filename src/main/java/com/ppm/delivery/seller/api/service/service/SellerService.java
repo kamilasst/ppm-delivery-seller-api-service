@@ -4,6 +4,7 @@ import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTOReq
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerNearSearchRequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerAvailableNearbyDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,13 +33,15 @@ public class SellerService implements ISellerService {
     private final ContextHolder contextHolder;
     private final ISellerRepository sellerRepository;
     private final IPermissionService permissionService;
+    private final SellerMapper sellerMapper;
 
     public SellerService(final ContextHolder contextHolder,
                          final ISellerRepository sellerRepository,
-                         final IPermissionService permissionService) {
+                         final IPermissionService permissionService, SellerMapper sellerMapper) {
         this.contextHolder = contextHolder;
         this.sellerRepository = sellerRepository;
         this.permissionService = permissionService;
+        this.sellerMapper = sellerMapper;
     }
 
     @Override
@@ -78,7 +80,7 @@ public class SellerService implements ISellerService {
     }
 
     @Override
-    public List<Seller> searchAvailableNearby(SellerNearSearchRequest request) {
+    public List<SellerAvailableNearbyDTOResponse> searchAvailableNearby(SellerNearSearchRequest request) {
 
         final String countryCode = contextHolder.getCountry();
 
@@ -93,7 +95,7 @@ public class SellerService implements ISellerService {
                 dayOfWeek,
                 orderHours);
 
-        return sellers;
+        return sellerMapper.toSellerAvailableNearbyDTOList(sellers);
     }
 
     private void validateCreate(SellerDTORequest sellerDTORequest) {

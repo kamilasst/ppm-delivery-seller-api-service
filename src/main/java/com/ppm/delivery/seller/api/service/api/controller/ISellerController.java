@@ -3,9 +3,9 @@ package com.ppm.delivery.seller.api.service.api.controller;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerNearSearchRequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerAvailableNearbyDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
-import com.ppm.delivery.seller.api.service.domain.model.Seller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +24,6 @@ public interface ISellerController {
     ResponseEntity<SellerUpdateDTOResponse> patchV1(@Valid @PathVariable String code, @RequestBody SellerUpdateDTORequest sellerUpdateDTO);
 
     @PostMapping("/search-nearby")
-    ResponseEntity<List<Seller>> searchAvailableNearby(@Valid @RequestBody SellerNearSearchRequest request);
+    ResponseEntity<List<SellerAvailableNearbyDTOResponse>> searchAvailableNearby(@Valid @RequestBody SellerNearSearchRequest request);
 
 }
