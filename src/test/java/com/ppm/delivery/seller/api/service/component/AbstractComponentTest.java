@@ -2,6 +2,7 @@ package com.ppm.delivery.seller.api.service.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ppm.delivery.seller.api.service.domain.mapper.SellerMapper;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,9 @@ public abstract class AbstractComponentTest {
     protected MockMvc mockMvc;
 
     protected static ObjectMapper objectMapper;
+
+    @Autowired
+    protected SellerMapper sellerMapper;
 
     @BeforeAll
     public static void setUpOnce() {

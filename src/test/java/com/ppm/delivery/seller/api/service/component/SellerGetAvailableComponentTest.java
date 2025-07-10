@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.ppm.delivery.seller.api.service.PpmDeliverySellerApiServiceApplication;
 import com.ppm.delivery.seller.api.service.api.constants.HeaderConstants;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerNearSearchRequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerAvailableNearbyDTOResponse;
 import com.ppm.delivery.seller.api.service.builder.BusinessHourTestBuilder;
 import com.ppm.delivery.seller.api.service.builder.SellerBuilder;
 import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
@@ -21,13 +22,12 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 
 
 @AutoConfigureMockMvc
@@ -103,9 +103,9 @@ public class SellerGetAvailableComponentTest extends AbstractComponentTest {
                 .andExpect(status().isOk());
 
         //Assert
-        List<Seller> responseSellers = objectMapper.readValue(
+        List<SellerAvailableNearbyDTOResponse> responseSellers = objectMapper.readValue(
                 resultActions.andReturn().getResponse().getContentAsString(),
-                new TypeReference<List<Seller>>() {
+                new TypeReference<List<SellerAvailableNearbyDTOResponse>>() {
                 }
         );
 
@@ -113,12 +113,13 @@ public class SellerGetAvailableComponentTest extends AbstractComponentTest {
 
         assertFalse(responseSellers.isEmpty(), "The seller list must not be empty.");
         assertEquals(3, responseSellers.size(), "Should return only 3 active sellers that are nearby and open at the given time.");
-        assertThat(responseSellers, containsInAnyOrder(
-                sellerActiveInRangeOpenNow,
-                sellerActiveInRangeOpenNow2,
-                sellerSameLocationOpen
-        ));
 
+        List<SellerAvailableNearbyDTOResponse> expectedSellers = List.of(
+                sellerMapper.toSellerAvailableNearbyDTO(sellerActiveInRangeOpenNow),
+                sellerMapper.toSellerAvailableNearbyDTO(sellerActiveInRangeOpenNow2),
+                sellerMapper.toSellerAvailableNearbyDTO(sellerSameLocationOpen)
+        );
+        assertThat(responseSellers, containsInAnyOrder(expectedSellers.toArray()));
 
     }
 
