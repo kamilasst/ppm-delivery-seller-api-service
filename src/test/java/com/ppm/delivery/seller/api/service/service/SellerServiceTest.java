@@ -2,10 +2,13 @@ package com.ppm.delivery.seller.api.service.service;
 
 import com.ppm.delivery.seller.api.service.api.domain.request.BusinessHourDTORequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.request.SellerNearSearchRequest;
 import com.ppm.delivery.seller.api.service.api.domain.request.SellerUpdateDTORequest;
+import com.ppm.delivery.seller.api.service.api.domain.response.SellerAvailableNearbyDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerDTOResponse;
 import com.ppm.delivery.seller.api.service.api.domain.response.SellerUpdateDTOResponse;
 import com.ppm.delivery.seller.api.service.api.interceptor.ContextHolder;
+import com.ppm.delivery.seller.api.service.builder.SellerAvailableNearbyDTOResponseBuilder;
 import com.ppm.delivery.seller.api.service.builder.SellerBuilder;
 import com.ppm.delivery.seller.api.service.builder.SellerDTORequestBuilder;
 import com.ppm.delivery.seller.api.service.constants.ConstantsMocks;
@@ -18,6 +21,7 @@ import com.ppm.delivery.seller.api.service.exception.BusinessException;
 import com.ppm.delivery.seller.api.service.exception.EntityNotFoundException;
 import com.ppm.delivery.seller.api.service.exception.MessageErrorConstants;
 import com.ppm.delivery.seller.api.service.repository.ISellerRepository;
+import com.ppm.delivery.seller.api.service.utils.DateFormatter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,10 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SellerServiceTest {
@@ -52,7 +53,7 @@ public class SellerServiceTest {
 
     @BeforeEach
     void setUp() {
-        PermissionService permissionValidator = new PermissionService(contextHolder); // cria com o mock contextHolder
+        PermissionService permissionValidator = new PermissionService(contextHolder);
         sellerService = new SellerService(contextHolder, sellerRepository, permissionValidator, sellerMapper);
     }
 
@@ -487,5 +488,157 @@ public class SellerServiceTest {
 
     }
 
+    @Test
+    void shouldReturnListOfSellerAvailableNearbyDTOResponse() {
+        // Arrange
+        SellerNearSearchRequest.DeliveryInfoDTO deliveryInfo =
+                new SellerNearSearchRequest.DeliveryInfoDTO(-23.0, -46.0);
 
+        LocalDateTime orderCreateDate = LocalDateTime.of(2025, 7, 10, 14, 30);
+        String orderHours = DateFormatter.getHours(orderCreateDate);
+
+        SellerNearSearchRequest request =
+                new SellerNearSearchRequest(orderCreateDate, deliveryInfo, 10.0, null);
+
+        Mockito.when(contextHolder.getCountry()).thenReturn(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Seller seller1 = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+        Seller seller2 = SellerBuilder.createDefault(ConstantsMocks.COUNTRY_CODE_BR);
+        seller2.setCode("11111111-1111-1111-1111-111111111111");
+        List<Seller> sellers = List.of(seller1, seller2);
+
+        Mockito.when(sellerRepository.searchAvailableNearby(
+                        Mockito.eq(ConstantsMocks.COUNTRY_CODE_BR),
+                        Mockito.eq(deliveryInfo.latitude()),
+                        Mockito.eq(deliveryInfo.longitude()),
+                        Mockito.eq(request.radius()),
+                        Mockito.eq(orderCreateDate.getDayOfWeek().name()),
+                        Mockito.eq(orderHours)))
+                .thenReturn(sellers);
+
+        SellerAvailableNearbyDTOResponse dto1 = SellerAvailableNearbyDTOResponseBuilder.createDefault(seller1);
+        SellerAvailableNearbyDTOResponse dto2 = SellerAvailableNearbyDTOResponseBuilder.createDefault(seller2);
+        List<SellerAvailableNearbyDTOResponse> expectedDTOs = List.of(dto1, dto2);
+
+        Mockito.when(sellerMapper.toSellerAvailableNearbyDTOList(sellers))
+                .thenReturn(expectedDTOs);
+
+        // Act
+        List<SellerAvailableNearbyDTOResponse> result = sellerService.searchAvailableNearby(request);
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.size());
+
+        for (int i = 0; i < expectedDTOs.size(); i++) {
+            SellerAvailableNearbyDTOResponse expected = expectedDTOs.get(i);
+            SellerAvailableNearbyDTOResponse actual   = result.get(i);
+
+            Assertions.assertAll("Verify DTO[" + i + "]",
+                    () -> Assertions.assertEquals(expected.getCode(),        actual.getCode(),        "code"),
+                    () -> Assertions.assertEquals(expected.getCountryCode(), actual.getCountryCode(), "countryCode"),
+                    () -> Assertions.assertEquals(expected.getName(),        actual.getName(),        "name"),
+                    () -> Assertions.assertEquals(expected.getDisplayName(), actual.getDisplayName(), "displayName"),
+                    () -> Assertions.assertEquals(expected.getStatus(),      actual.getStatus(),      "status"),
+
+                    () -> Assertions.assertEquals(expected.getIdentification().getType(),
+                            actual.getIdentification().getType(), "ident.type"),
+                    () -> Assertions.assertEquals(expected.getIdentification().getCode(),
+                            actual.getIdentification().getCode(), "ident.code"),
+
+                    () -> {
+                        Assertions.assertEquals(expected.getContacts().size(),
+                                actual.getContacts().size(), "contacts.size");
+                        var expContact = expected.getContacts().get(0);
+                        var actContact = actual  .getContacts().get(0);
+                        Assertions.assertEquals(expContact.getType(),  actContact.getType(),  "contact.type");
+                        Assertions.assertEquals(expContact.getValue(), actContact.getValue(), "contact.value");
+                    },
+
+                    () -> {
+                        var expLoc = expected.getAddress().location();
+                        var actLoc = actual  .getAddress().location();
+                        Assertions.assertEquals(expLoc.city(),          actLoc.city(),          "city");
+                        Assertions.assertEquals(expLoc.country(),       actLoc.country(),       "country");
+                        Assertions.assertEquals(expLoc.state(),         actLoc.state(),         "state");
+                        Assertions.assertEquals(expLoc.number(),        actLoc.number(),        "number");
+                        Assertions.assertEquals(expLoc.zipCode(),       actLoc.zipCode(),       "zipCode");
+                        Assertions.assertEquals(expLoc.streetAddress(), actLoc.streetAddress(), "streetAddress");
+                        Assertions.assertEquals(expLoc.geoCoordinates().latitude(),
+                                actLoc.geoCoordinates().latitude(),  "lat");
+                        Assertions.assertEquals(expLoc.geoCoordinates().longitude(),
+                                actLoc.geoCoordinates().longitude(), "lon");
+                    },
+
+                    () -> {
+                        Assertions.assertEquals(expected.getBusinessHours().size(),
+                                actual.getBusinessHours().size(), "hours.size");
+                        for (int j = 0; j < expected.getBusinessHours().size(); j++) {
+                            var expH = expected.getBusinessHours().get(j);
+                            var actH = actual.getBusinessHours().get(j);
+                            Assertions.assertEquals(expH.getDayOfWeek(), expH.getDayOfWeek(),
+                                    "hours.dayOfWeek[" + j + "]");
+                            Assertions.assertEquals(expH.getOpenAt(),    actH.getOpenAt(),
+                                    "hours.openAt[" + j + "]");
+                            Assertions.assertEquals(expH.getCloseAt(),   actH.getCloseAt(),
+                                    "hours.closeAt[" + j + "]");
+                        }
+                    }
+            );
+        }
+
+        Mockito.verify(contextHolder).getCountry();
+        Mockito.verify(sellerRepository, Mockito.times(1)).searchAvailableNearby(
+                ConstantsMocks.COUNTRY_CODE_BR,
+                deliveryInfo.latitude(),
+                deliveryInfo.longitude(),
+                request.radius(),
+                orderCreateDate.getDayOfWeek().name(),
+                orderHours
+        );
+        Mockito.verify(sellerMapper).toSellerAvailableNearbyDTOList(sellers);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoSellerFound() {
+        // Arrange
+        SellerNearSearchRequest.DeliveryInfoDTO deliveryInfo =
+                new SellerNearSearchRequest.DeliveryInfoDTO(-23.0, -46.0);
+
+        LocalDateTime orderCreateDate = LocalDateTime.of(2025, 7, 10, 14, 30);
+        String orderHours = DateFormatter.getHours(orderCreateDate);
+
+        SellerNearSearchRequest request =
+                new SellerNearSearchRequest(orderCreateDate, deliveryInfo, 10.0, null);
+
+        Mockito.when(contextHolder.getCountry()).thenReturn(ConstantsMocks.COUNTRY_CODE_BR);
+
+        Mockito.when(sellerRepository.searchAvailableNearby(
+                        Mockito.eq(ConstantsMocks.COUNTRY_CODE_BR),
+                        Mockito.eq(deliveryInfo.latitude()),
+                        Mockito.eq(deliveryInfo.longitude()),
+                        Mockito.eq(10.0),
+                        Mockito.eq(orderCreateDate.getDayOfWeek().name()),
+                        Mockito.eq(orderHours)))
+                .thenReturn(new ArrayList<>());
+
+        Mockito.when(sellerMapper.toSellerAvailableNearbyDTOList(new ArrayList<>())).thenReturn(new ArrayList<>());
+
+        // Act
+        List<SellerAvailableNearbyDTOResponse> result = sellerService.searchAvailableNearby(request);
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.isEmpty());
+
+        Mockito.verify(contextHolder).getCountry();
+        Mockito.verify(sellerRepository, Mockito.times(1)).searchAvailableNearby(
+                Mockito.eq(ConstantsMocks.COUNTRY_CODE_BR),
+                Mockito.eq(deliveryInfo.latitude()),
+                Mockito.eq(deliveryInfo.longitude()),
+                Mockito.eq(request.radius()),
+                Mockito.eq(orderCreateDate.getDayOfWeek().name()),
+                Mockito.eq(orderHours));
+        Mockito.verify(sellerMapper).toSellerAvailableNearbyDTOList(new ArrayList<>());
+    }
 }
