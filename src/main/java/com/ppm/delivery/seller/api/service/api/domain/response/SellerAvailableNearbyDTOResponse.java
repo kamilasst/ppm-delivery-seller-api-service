@@ -1,6 +1,6 @@
 package com.ppm.delivery.seller.api.service.api.domain.response;
 
-import com.ppm.delivery.seller.api.service.domain.model.Address;
+import com.ppm.delivery.seller.api.service.api.domain.request.AddressDTORequest;
 import com.ppm.delivery.seller.api.service.domain.model.Identification;
 import com.ppm.delivery.seller.api.service.domain.model.enums.Status;
 import lombok.*;
@@ -21,7 +21,7 @@ public class SellerAvailableNearbyDTOResponse {
     private String name;
     private String displayName;
     private List<ContactDTO> contacts;
-    private Address address;
+    private AddressDTORequest address;
     private Status status;
     private List<BusinessHourDTO> businessHours;
 
